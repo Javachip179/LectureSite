@@ -284,9 +284,9 @@ router.get('/question/:lectureId', (req, res) => {
     // SQL 쿼리 실행
     const query = `
         SELECT 
-          c.*
+          q.*
         FROM 
-          Comments c 
+          Question c 
         WHERE 
           c.LectureID = '${lectureId}'
         ORDER BY WriteDate DESC ;
@@ -311,16 +311,14 @@ router.post('/add-question', async (req, res) => {
   try {
     const userId = req.body.UserID;
     const lectureId = req.body.LectureID;
-    const content = req.body.Content;
-    const currentDate = new Date();
-    const rating = req.body.Rating;
+    const questionContent = req.body.QuestionContent;
+    const createDate = new Date();
 
     console.log('Received data:', req.body);
     console.log('userId:', userId);
     console.log('lectureId:', lectureId);
-    console.log('content:', content);
-    console.log('currentDate:', currentDate);
-    console.log('rating:', rating);
+    console.log('questionContent:', questionContent);
+    console.log('createDate:', createDate);
 
     mysql.getConnection((error, conn) => {
       if (error) {
@@ -330,8 +328,8 @@ router.post('/add-question', async (req, res) => {
       }
 
       conn.query(
-        'INSERT INTO Comments (UserID, LectureID, Content, WriteDate, Rating) VALUES (?, ?, ?, ?, ?);',
-        [userId, lectureId, content, currentDate, rating],
+        'INSERT INTO Question (UserID, LectureID, QuestionContent, CreateDate) VALUES (?, ?, ?, ?);',
+        [userId, lectureId, questionContent, createDate],
         (err, result) => {
           console.log(result);
           if (err) {
@@ -354,7 +352,7 @@ router.post('/add-question', async (req, res) => {
   }
 });
 
-//
+// 동영상 시청
 router.get('/:lectureId/watch', (req, res) => {
   console.log(req.params);
   const lectureId = req.params.lectureId;

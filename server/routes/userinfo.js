@@ -167,88 +167,28 @@ router.post('/update-nickname', async (req, res) => {
   }
 });
 
-//전화번호 변경
-router.post('/update-cellphone', async (req, res) => {
-  try {
-    const userId = req.body.UserID;
-    const userCellPhone = req.body.UserCellPhone;
-    console.log(userCellPhone, userId);
-
-    mysql.getConnection((error, conn) => {
-      if (error) {
-        console.log(error);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-
-      conn.query(
-        'UPDATE Users u SET u.userCellPhone = ? WHERE u.UserID = ?',
-        [userCellPhone, userId],
-        (err, result) => {
-          console.log(result);
-          if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-            return;
-          }
-          conn.release();
-        }
-      );
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-//유저 소개 변경
-router.post('/update-introduction', async (req, res) => {
-  try {
-    const userId = req.body.UserID;
-    const introduction = req.body.Introduction;
-    console.log(introduction, userId);
-
-    mysql.getConnection((error, conn) => {
-      if (error) {
-        console.log(error);
-        res.status(500).send('Internal Server Error');
-        return;
-      }
-
-      conn.query(
-        'UPDATE Users u SET u.Introduction = ? WHERE u.UserID = ?',
-        [introduction, userId],
-        (err, result) => {
-          console.log(result);
-          if (err) {
-            console.log(err);
-            res.status(500).send('Internal Server Error');
-            return;
-          }
-          conn.release();
-        }
-      );
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 //비밀번호 변경
 router.post('/update-password', async (req, res) => {
   try {
     const userId = req.body.UserID;
     const password = req.body.Password;
+    const passwordCheck = req.body.PasswordCheck;
     const newPassword = req.body.NewPassword;
     console.log(
       'userId: ' +
         userId +
         ' Password: ' +
         password +
+        'passwordCheck' +
+        passwordCheck +
         ' newPassword: ' +
         newPassword
     );
+
+    if (password !== passwordCheck) {
+      console.log('비밀번호가 일치하지 않습니다.');
+      res.redirect('/signUp');
+    }
 
     mysql.getConnection((error, conn) => {
       if (error) {
