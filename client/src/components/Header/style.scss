@@ -1,0 +1,101 @@
+// style.scss
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff; // 배경색은 이미지에 따라 조정해야 할 수 있습니다.
+  padding: 0 20px;
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+  }
+
+  .logo img {
+    height: 40px; // 로고의 크기는 이미지에 따라 조정해야 할 수 있습니다.
+    margin-right: 50px;
+  }
+
+  .drop-down {
+    position: relative;
+    display: inline-block; // 드롭다운을 인라인 블록으로 설정
+    font-size: 0.9rem;
+    appearance: none;
+    
+    &:hover {
+      color: #ff9000;
+    }
+  
+    &:hover .dropdown-content {
+      display: block;
+      appearance: none;
+    }
+  }
+  
+  .dropdown-toggle {
+    padding: 10px 15px;
+    background-color: #fff;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    min-width: 160px; // 메뉴의 최소 너비를 설정
+
+    .dropdown-toggle::after {
+      // 화살표를 제거합니다.
+      content: none;
+    }
+    
+    a {
+      padding: 12px 16px;
+      display: block;
+      text-decoration: none;
+      color: black;
+      
+      &:hover {
+        background-color: #f7f7f7;
+      }
+    }
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+
+    .in-link {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      color: #333;
+      h6 {
+        margin: 0;
+        font-weight: normal;
+        font-size: 0.9rem;
+      }
+    }
+
+    .up-link {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      h6 {
+        margin: 0;
+        font-weight: normal;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
