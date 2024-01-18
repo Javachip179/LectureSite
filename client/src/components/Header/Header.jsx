@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ITLogo from '../../img/it.png';
+import React, { useState } from 'react';
+import ITTLogo from '../../img/allitone.png';
 import './style.scss';
+import SignIn from '../../pages/auth/signIn/SignIn';
 
 const Header = () => {
+  const [showSignIn, setShowSignIn] = useState(false);
+
+  const toggleSignIn = () => {
+    setShowSignIn(!showSignIn);
+  };
+
   return (
     <div className='header'>
       <div className='container'>
         <div className='logo-container'>
           <Link to='/'>
             <div className='logo'>
-              <img src={ITLogo} alt='YouGotIT 로고' />
+              <img src={ITTLogo} alt='YouGotIT 로고' />
             </div>
           </Link>
         </div>
@@ -28,14 +35,15 @@ const Header = () => {
         </div>
 
         <div className='links'>
-          <Link className='in-link' to='/signIn'>
+          <div className='in-link' onClick={toggleSignIn}>
             <h6 className='header-text'>로그인</h6>
-          </Link>
+          </div>
           <Link className='up-link' to='/signUp'>
             <h6 className='header-text'>회원가입</h6>
           </Link>
         </div>
       </div>
+      {showSignIn && <SignIn toggleSignIn={toggleSignIn} />}
     </div>
   );
 };

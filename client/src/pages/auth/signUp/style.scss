@@ -1,136 +1,107 @@
-$lightGreen : #b9e7e7;
-$default-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-
-body {
-  font-family: $default-font;
-}
-
-.app {
+.signup-container {
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #fff;
+}
 
-  .container {
-    width: 1024px;
+.signup-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+  
+  .signup-title {
+    text-align: center;
+  }
 
-    .link {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    // LOGIN & REGISTER 
-    .auth {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: white;
-
-      form {
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        background-color: white;
-        width: 300px;
-        gap: 10px;
-        border: solid 0.1px rgba(0, 0, 0);
-
-
-        .checkbox-container {
-          display: flex;
-          align-items: center; 
-          align-content: center;
-        }
-        
-        .checkbox-container input {
-          width: 20px;
-          height: 20px;
-          margin: 3px 3px 3px 3px;
-        }
-
-        .join-form{
-          overflow-y: scroll;
-          max-height: 100px;
-          font-size: 10px;
-        }
-
-        .logo {
-          img {
-            width: 100%;
-            height: 100px;
-          }
-          cursor: pointer;
-        }
-
-        h4 {
-          text-align: center;
-        }
-
-        .form-group {
-
-          max-height: 200px;
-          overflow-y: scroll;
-        } 
-
-        input {
-          width: 90%;
-          padding: 10px;
-          margin: 3px;
-          border: solid 0.1px rgba(0, 0, 0, 0.2);
-          // border-bottom: 1px solid gray;
-        }
-
-        .checkbox {
-          width: 10px;
-        }
-
-        button {
-          padding: 10px;
-          border: none;
-          background-color: rgba(0, 0, 0, 0.2);
-          cursor: pointer;
-          color: black;
-
-        }
-
-        .button-group{
-          width: 100%;
-          display: flex;
-          gap: 10px;
-
-          button , Link{
-            flex: 1;
-          }
-        }
-
-        p {
-          font-size: 12px;
-          height: 5px;
-        }
-
-        span {
-          font-size: 12px;
-          text-align: center;
-
-        }
-      }
-
-      .simple-signUp{
-        text-align: center;
-        height: 100px;
-        
-        h3{
-          margin: 0px;
-          padding: 0px;
-        }
-
-        img{
-          width: 80%;
-          height: 80px;
-        }
-      }
-    
-    }
+  .signup-subtitle {
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap; // 텍스트가 한 줄로 유지되도록 합니다.
+    width: 100%;
+    animation: slideText 10s linear infinite;
+    transform: translateY(-50%);
+    color: #666;
+    margin-top: 5px;
+    font-size: 0.9rem;
 
   }
-}
+  
+  @keyframes slideText {
+    0% {
+      left: 100%; // 시작 지점
+    }
+    100% {
+      left: -100%; // 끝 지점
+    }
+  }
+
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    
+    .signup-input {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 12px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .signup-question {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .signin-link {
+      color: #4682B4; // Or the color of your choice
+      text-decoration: none; // Removes the underline from links
+    
+      &:hover {
+        text-decoration: underline; // Adds an underline on hover
+      }
+    }
+
+    .signup-button,
+    .kakao-signup {
+      border: none;
+      border-radius: 5px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .signup-button {
+     background: linear-gradient(to right, #4682B4, darken(#4682B4, 10%)); // Start and end with the same color, but darken the end for effect
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.3s ease; // Optional: for a smooth transition on hover
+      
+      &:hover {
+        background: linear-gradient(to right, darken(#4682B4, 5%), darken(#4682B4, 15%)); // Darken the gradient on hover
+      }
+    }  
+
+    .kakao-signup {
+      background: #fee500;
+      color: black;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      cursor: pointer;
+      }
+    }
+  }
+

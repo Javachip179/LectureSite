@@ -14,14 +14,13 @@ import Single from "./pages/Single"
 import Search from "./pages/search/Search"
 import Courses from "./pages/Courses"
 import OnlineStudy from "./pages/OnlineStudy"
-import Profile from "./pages/mypage/Mypage"
-import MyOnline from "./pages/MyOnline"
-import Cart from "./pages/mypage/cart/Cart";
-import Payment from "./pages/mypage/payment/Payment"
-import Mypage from "./pages/mypage/Mypage";
-
-import Header from "../src/components/Header/Header"
-import Footer from "../src/components/Footer/Footer"
+import Profile from './pages/mypage/profile/profile';
+import MyOnline from './pages/MyOnline';
+import Cart from './pages/mypage/cart/Cart';
+import Payment from './pages/mypage/payment/payment';
+import Mypage from './pages/mypage/Mypage';
+import Header from '../src/components/Header/Header';
+import Footer from '../src/components/Footer/Footer';
 
 const Layout = () => {
   return (
@@ -30,70 +29,72 @@ const Layout = () => {
       <Outlet />
       <Footer />
     </>
-  )
-}
-
+  );
+};
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
     children: [
       {
-        path: "/",
-        element: <Home />
+        path: '/',
+        element: <Home />,
       },
       {
-        path: "/post/:id",
-        element: <Single />
+        path: '/post/:id',
+        element: <Single />,
       },
       {
-        path: "/write",
-        element: <Write />
+        path: '/write',
+        element: <Write />,
       },
       {
-        path: "/search",
-        element: <Search />
+        path: '/search',
+        element: <Search />,
       },
       {
-        path: "/courses",
-        element: <Courses />
+        path: '/courses',
+        element: <Courses />,
       },
       {
-        path: "/mypage",
-        element: <Mypage />
+        path: '/mypage',
+        element: <Mypage />,
       },
       {
-        path: "/profile",
-        element: <Profile />
+        path: '/profile',
+        element: <Profile />,
       },
       {
-        path: "/myonline",
-        element: <MyOnline />
+        path: '/payment',
+        element: <Payment />,
       },
       {
-        path: "/cart",
-        element: <Cart />
+        path: '/myonline',
+        element: <MyOnline />,
       },
       {
-        path: "/payment",
-        element: <Payment />
+        path: '/cart',
+        element: <Cart />,
       },
-    ]
+      {
+        path: '/payment',
+        element: <Payment />,
+      },
+    ],
   },
   {
-    path: "/signUp",
-    element: <SignUp />
+    path: '/signUp',
+    element: <SignUp />,
   },
   {
-    path: "/signIn",
-    element: <SignIn />
+    path: '/signIn',
+    element: <SignIn />,
   },
   {
-    path: "/onlinestudy",
-    element: <OnlineStudy />
+    path: '/onlinestudy',
+    element: <OnlineStudy />,
   },
-
 ]);
 
 function App() {

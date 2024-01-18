@@ -5,13 +5,15 @@
   align-items: center;
   background-color: #fff; // 배경색은 이미지에 따라 조정해야 할 수 있습니다.
   padding: 0 20px;
+  border-bottom: 1px solid white;
+  box-shadow: 0 8px 6px -7px rgba(0, 0, 0, 0.1);
 
   .container {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
   }
 
@@ -27,7 +29,7 @@
     appearance: none;
     
     &:hover {
-      color: #ff9000;
+      color: #4682B4;
     }
   
     &:hover .dropdown-content {
@@ -91,6 +93,7 @@
       padding: 10px 15px;
       text-decoration: none;
       font-size: 0.9rem;
+      color: #4682B4;
       h6 {
         margin: 0;
         font-weight: normal;
