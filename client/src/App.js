@@ -8,16 +8,16 @@ import {
 
 import SignUp from "./pages/auth/signUp/SignUp"
 import SignIn from "./pages/auth/signIn/SignIn"
-import Write from "./pages/Write"
+import Write from "./pages/dodo/Write"
 import Home from "./pages/home/Home"
-import Single from "./pages/Single"
+import Single from "./pages/dodo/Single"
 import Search from "./pages/search/Search"
-import Courses from "./pages/Courses"
-import OnlineStudy from "./pages/OnlineStudy"
+import Courses from "./pages/dodo/Courses"
+import OnlineStudy from "./pages/dodo/OnlineStudy"
 import Profile from './pages/mypage/profile/profile';
-import MyOnline from './pages/MyOnline';
+import MyOnline from './pages/dodo/MyOnline';
 import Cart from './pages/cart/Cart';
-import Payment from './pages/mypage/payment/payment';
+import Payment from './pages/mypage/payment/Payment';
 import Mypage from './pages/mypage/Mypage';
 import Header from '../src/components/Header/Header';
 import Footer from '../src/components/Footer/Footer';
