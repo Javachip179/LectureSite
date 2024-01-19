@@ -31,7 +31,7 @@ const MyPage = () => {
   };
 
   return (
-    <div className='profile-page'>
+    <div className='my-page'>
       <header className='profile-header'>
         <img src={profileimage} alt='Profile' className='profile-pic' />
         <h1 className='profile-name'>이종호 님</h1>{' '}
@@ -57,8 +57,6 @@ const MyPage = () => {
           </li>
         </ul>
       </nav>
-
-      <h2 className='course-list-title'>수강중인 강좌</h2>
 
       <div className='course-list'>
         {courses.map((course, index) => (

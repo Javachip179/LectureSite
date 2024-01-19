@@ -16,7 +16,7 @@ import Courses from "./pages/Courses"
 import OnlineStudy from "./pages/OnlineStudy"
 import Profile from './pages/mypage/profile/profile';
 import MyOnline from './pages/MyOnline';
-import Cart from './pages/mypage/cart/Cart';
+import Cart from './pages/cart/Cart';
 import Payment from './pages/mypage/payment/payment';
 import Mypage from './pages/mypage/Mypage';
 import Header from '../src/components/Header/Header';

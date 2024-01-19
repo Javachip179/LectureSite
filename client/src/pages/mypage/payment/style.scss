@@ -1,75 +1,90 @@
-.payment {
+.profile-nav a {
+  // 기본 링크 스타일
+  text-decoration: none;
+  color: #333;
+  padding: 10px;
+  display: block; // 링크를 블록 요소로 만들어 패딩 적용
+}
+
+.profile-nav a.active {
+  border-bottom: 1px solid #4682B4;
+  color: #4682B4;
+}
+
+.profile-header {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border-bottom: 1px solid #ccc;
+}
+
+.profile-pic {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 20px;
+}
+
+.profile-name {
+  margin-left: 20px;
+}
+
+.profile-page {
+  font-family: 'Arial', sans-serif;
+}
+
+.profile-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-evenly;
+  border-bottom: 1px solid #ccc;
+}
+// mypage 기본틀
+
+.payment-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  gap: 20px;
+  border-radius: 10px;
+  margin: auto;
+  margin-top: 10px;
+}
 
-  .list-title {
-    font-size: 24px;
-    margin-bottom: 15px;
-  }
+.payment-row-group {
+  border: 1px solid #000;
+  margin-bottom: 10px;
+}
 
-  .payment-card img {
-    width: 50px; /* 원하는 가로 크기로 조절 */
-    height: 50px; /* 원하는 세로 크기로 조절 */
-  }
+.payment-row {
+  display: flex;
+}
 
-  .payment-table {
-    border: 1px solid #ddd;
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
+.payment-title-row,
+.payment-info-row {
+  width: 100%;
+}
 
-  .payment-table tr,
-  .payment-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: center;
-  }
+.payment-title,
+.payment-info {
+  flex: 1;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-  .payment-table tr {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
+.payment-title-row .payment-title {
+  font-weight: bold;
+  background-color: #f3f3f3;
+  border-bottom: 1px solid #000;
+}
 
-  .payment-table td img {
-    max-width: 100px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-  }
-
-  .payment-card {
-    margin-top: 20px;
-  }
-
-  .payment-no,
-  .payment-name,
-  .payment-email,
-  .payment-title,
-  .payment-price,
-  .payment-date,
-  .payment-progress {
-    font-size: 14px;
-  }
-
-  .payment-progress {
-    font-weight: bold;
-    color: green;
-  }
-
-  .payment-btn {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .payment-btn:hover {
-    background-color: #0056b3;
-  }
+.payment-info-row .payment-info {
+  text-align: center;
+  border-bottom: none;
 }
