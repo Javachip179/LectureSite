@@ -7,19 +7,19 @@ const Payment = () => {
   // 여러 개의 임시 데이터를 배열로 초기 상태 설정
   const [payments, setPayments] = useState([
     {
-      id: 1,
+      paymentId: 1,
       courseName: '웹 개발 마스터',
       paymentDate: '2024-01-19 12:00:00',
       coursePrice: 30000,
     },
     {
-      id: 2,
+      paymentId: 2,
       courseName: '데이터 사이언스 입문',
       paymentDate: '2024-01-20 15:30:00',
       coursePrice: 45000,
     },
     {
-      id: 3,
+      paymentId: 3,
       courseName: '인공지능 기초',
       paymentDate: '2024-01-22 11:00:00',
       coursePrice: 50000,
@@ -67,18 +67,20 @@ const Payment = () => {
         </ul>
       </div>
       <div className='payment-container'>
+        <div className='payment-row-group'>
+          <div className='payment-row payment-title-row'>
+            <div className='payment-title'>결제 번호</div>
+            <div className='payment-title'>강의 이름</div>
+            <div className='payment-title'>결제 날짜</div>
+            <div className='payment-title'>강의 가격</div>
+          </div>
+        </div>
         {payments.map(payment => (
-          <div key={payment.id} className='payment-row-group'>
-            <div className='payment-row payment-title-row'>
-              <div className='payment-title'>강의 이름</div>
-              <div className='payment-title'>결제 날짜</div>
-              <div className='payment-title'>강의 가격</div>
-            </div>
-            <div className='payment-row payment-info-row'>
-              <div className='payment-info'>{payment.courseName}</div>
-              <div className='payment-info'>{payment.paymentDate}</div>
-              <div className='payment-info'>{`₩${payment.coursePrice.toLocaleString()}`}</div>
-            </div>
+          <div key={payment.paymentId} className='payment-row payment-info-row'>
+            <div className='payment-info'>{payment.paymentId}</div>
+            <div className='payment-info'>{payment.courseName}</div>
+            <div className='payment-info'>{payment.paymentDate}</div>
+            <div className='payment-info'>{`₩${payment.coursePrice.toLocaleString()}`}</div>
           </div>
         ))}
       </div>

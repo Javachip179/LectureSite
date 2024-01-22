@@ -55,36 +55,45 @@
   margin-top: 10px;
 }
 
-.payment-row-group {
-  border: 1px solid #000;
-  margin-bottom: 10px;
-}
-
-.payment-row {
+.payment-title-row, .payment-info-row {
   display: flex;
-}
-
-.payment-title-row,
-.payment-info-row {
   width: 100%;
 }
 
-.payment-title,
-.payment-info {
-  flex: 1;
+.payment-title, .payment-info {
+  flex: 1; /* 각 셀이 동일한 공간을 차지하도록 설정 */
   padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  box-sizing: border-box; /* 패딩과 테두리를 요소의 총 너비에 포함 */
+  text-align: left;
+  border-right: 1px solid #ddd;
 }
 
-.payment-title-row .payment-title {
-  font-weight: bold;
-  background-color: #f3f3f3;
-  border-bottom: 1px solid #000;
+.payment-title:last-child, .payment-info:last-child {
+  border-right: none;
 }
 
-.payment-info-row .payment-info {
-  text-align: center;
+.payment-row {
+  border-bottom: 1px solid #ddd;
+}
+
+.payment-row:last-child {
   border-bottom: none;
+}
+
+/* 정렬을 위한 추가 스타일 */
+.payment-title-row {
+  margin-bottom: -1px; /* 첫 번째 정보 행의 테두리와 겹치게 하여 정렬 유지 */
+}
+
+.payment-info-row {
+  border-top: 1px solid #ddd; /* 제목 행의 하단 테두리와 정렬을 맞추기 위한 상단 테두리 추가 */
+}
+
+.payment-title::marker {
+  list-style-type: none;
+  list-style: none;
+}
+
+.payment-title {
+  font-weight: bold; /* 텍스트 굵게 */
 }
