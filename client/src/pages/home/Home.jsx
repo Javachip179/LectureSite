@@ -44,9 +44,11 @@ const Home = () => {
           placeholder='강의를 검색해보세요'
           className='search-input'
         />
-        <button className='search-button'>
-          <Search />
-        </button>
+        <Link to='/search'>
+          <button className='search-button'>
+            <Search />
+          </button>
+        </Link>
       </div>
 
       <div className='card-container'>
