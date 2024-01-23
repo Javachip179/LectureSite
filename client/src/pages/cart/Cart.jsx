@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './style.scss'; // 가정한 SCSS 파일입니다. 실제 파일 경로에 맞게 수정해주세요.
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Cart = () => {
   // 강의 목록과 선택된 강의들의 상태를 관리합니다.
@@ -15,6 +16,15 @@ const Cart = () => {
     },
     {
       id: 2,
+      title: 'Node.js 마스터',
+      instructor: '노드마스터',
+      price: 69999,
+      imageUrl:
+        'https://cdn.inflearn.com/public/courses/329963/cover/26550c58-624a-41c8-86dc-fea75b6c3b22/thumbnail-frontnew.png',
+      checked: false,
+    },
+    {
+      id: 3,
       title: 'Node.js 마스터',
       instructor: '노드마스터',
       price: 69999,
