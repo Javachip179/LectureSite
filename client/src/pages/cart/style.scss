@@ -1,0 +1,238 @@
+.cart-title {
+  text-align: left; 
+  margin-top: 20px; // 타이틀과 상단 컨테이너 사이의 간격을 조정합니다.
+}
+
+.cart-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .left-section {
+    width: 70%; // 화면의 70%를 차지하도록 설정
+    margin-right: 2%; // 오른쪽 섹션과의 간격 설정
+  }
+
+  .right-section {
+    width: 28%; // 나머지 너비 설정
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc; // 경계선 추가
+
+    .select-all {
+      display: flex;
+      align-items: center;
+      font-size: 1.1rem;
+    
+      input[type='checkbox'] {
+        // 체크박스 스타일
+        margin-right: 10px; // 텍스트와의 간격
+    
+        // 체크박스 커스텀 스타일
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        cursor: pointer;
+    
+        &:checked {
+          background-color: #4682B4;
+        }
+      }
+    
+      label {
+        // '전체 선택' 라벨 스타일
+        cursor: pointer;
+      }
+    }
+
+    .delete-selected {
+      border: 1px solid #ccc; // 회색 테두리
+      background-color: transparent; // 투명 배경
+      color: #333; // 어두운 글자색
+      padding: 5px 10px; // 내부 패딩
+      border-radius: 3px; // 둥근 모서리
+      font-size: 14px; // 글자 크기
+      cursor: pointer; // 마우스 오버 시 커서 변경
+      display: inline-block; // 인라인 블록 요소로 표시
+      margin: 0; // 마진 제거
+      line-height: normal; // 라인 높이 정상으로 설정
+      white-space: nowrap; // 텍스트 줄바꿈 없음
+    
+      &:after {
+        display: inline-block; // 인라인 블록 요소로 표시
+        margin-left: 5px; // 기호와 텍스트 사이의 간격
+      }
+    }
+  }
+
+  .cart-items {
+    .cart-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+
+      .checkbox-label {
+        position: relative;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+  
+        input[type='checkbox'] {
+          display: none; // 기본 체크박스 숨김
+        }
+  
+        .custom-checkbox {
+          width: 13px;
+          height: 13px;
+          border: 1px solid #999;
+          border-radius: 4px;
+          margin-right: 10px;
+          position: relative;
+          cursor: pointer;
+  
+          &:before {
+            color: transparent;
+            font-size: 14px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+          }
+        }
+  
+        input[type='checkbox']:checked + .custom-checkbox {
+          background-color: #4682B4;
+        }
+  
+        input[type='checkbox']:checked + .custom-checkbox:before {
+          color: #fff;
+          opacity: 1;
+        }
+      }
+      
+      .item-image {
+        width: 150px;
+        height: auto;
+        margin-right: 20px;
+        border-radius: 10px;
+      }
+
+      .item-details {
+        flex-grow: 1;
+
+        .item-title {
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+        .item-instructor {
+          font-size: 14px;
+          color: #888;
+          margin: 5px 0;
+        }
+
+        .item-price {
+          font-size: 16px;
+          color: #ff6347;;
+        }
+      }
+
+      .remove-item {
+        color: #f00;
+        cursor: pointer;
+        font-size: 24px;
+        padding: 0 20px;
+      }
+    }
+  }
+
+  .user-info-container, .order-summary-container {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    background: #fff;
+  }
+
+  .info-title {
+    border-bottom: 1px solid #ccc;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+  }
+  
+  // 새로운 .info-row 클래스를 추가합니다.
+  .info-row {
+    display: flex; // flexbox 레이아웃을 적용하여 라벨과 내용을 같은 줄에 표시합니다.
+    align-items: center; // 세로 중앙 정렬
+    margin-bottom: 5px; // 줄 사이의 간격을 조정합니다.
+  }
+  
+  .info-label {
+    font-size: 0.8rem; // 라벨 글자 크기를 .info-content와 동일하게 조정합니다.
+    color: #333;
+    margin-right: 10px; // 라벨과 내용 사이의 간격을 조절합니다.
+    font-weight: bold;
+  }
+  
+  .info-content {
+    font-size: 0.8rem;
+    color: #666;
+  }
+  
+  .summary-title {
+    border-bottom: 1px solid #ccc;
+    font-size: 1rem;
+    margin-bottom: 10px; // 요약 타이틀 아래 간격을 추가합니다.
+    padding-bottom: 5px;
+  }
+
+  .summary-row {
+    display: flex; // Use flexbox for inline layout
+    align-items: center; // Align items vertically in the center
+    margin-bottom: 5px; // Add some space between rows
+  }
+
+  .summary-label {
+    font-weight: bold;
+    margin-right: 10px; // Space between label and content
+    color: #333; // You might want to set the color to match .info-label
+    font-size: 0.8rem; // Match the font size of .info-content
+  }
+  
+  .summary-content {
+    font-size: 0.9rem;
+    color: #ff6347;
+  }
+  
+  .checkout-button {
+    background: linear-gradient(to right, #4682B4, darken(#4682B4, 10%));
+    color: #fff;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+  
+    &:hover {
+      background: linear-gradient(to right, #4682B4, darken(#4682B4, 15%));
+    }
+  }
+}

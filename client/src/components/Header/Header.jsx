@@ -1,14 +1,31 @@
-import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate로 변경
 import ITTLogo from '../../img/allitone.png';
 import './style.scss';
 import SignIn from '../../pages/auth/signIn/SignIn';
+import { Search } from '@mui/icons-material';
 
 const Header = () => {
   const [showSignIn, setShowSignIn] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate(); // useNavigate 사용
 
   const toggleSignIn = () => {
     setShowSignIn(!showSignIn);
+  };
+
+  const handleSearch = () => {
+    // 검색 버튼 클릭 또는 엔터 키를 눌렀을 때 실행되는 검색 함수
+    // 검색 쿼리(searchQuery)를 사용하여 검색 기능을 구현할 수 있습니다.
+    console.log('검색 쿼리:', searchQuery);
+
+    // '/search' 페이지로 이동
+    navigate(`/search?query=${searchQuery}`);
+  };
+
+  const handleSearchInputChange = event => {
+    // 검색 입력란의 내용이 변경될 때마다 호출되는 함수
+    setSearchQuery(event.target.value);
   };
 
   return (
@@ -32,6 +49,18 @@ const Header = () => {
             <Link to='/page3'>파이썬</Link>
             <Link to='/page4'>리액트</Link>
           </div>
+        </div>
+
+        <div className='search-bar'>
+          <input
+            type='text'
+            placeholder=' '
+            value={searchQuery}
+            onChange={handleSearchInputChange}
+          />
+          <button onClick={handleSearch}>
+            <Search />
+          </button>
         </div>
 
         <div className='links'>
