@@ -1,49 +1,52 @@
-.search-page-container {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 20px;
+.search-page-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
 
-  .banner-container {
-    img {
-      width: 100%;
-      height: auto;
-      object-fit: cover;
-    }
-  }
+.search-page-container img {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+  margin-top: 50px;
+}
 
-  .search-content {
-    font-family: 'Roboto', sans-serif;
+.search-content {
+  font-family: 'Roboto', sans-serif;
+  flex-grow: 1;
+  padding-left: 30px;
+  padding-top: 50px;
 
-    .search-header {
+  .search-header {
+    .search-top-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
 
-      .search-bar {
-        display: flex;
-        align-items: center;
-        position: relative;
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 5px;
-        padding: 1px 10px;
-        width: 100%;
-        max-width: 700px;
-        margin-left: 100px;
+    .search-bar {
+      display: flex;
+      align-items: center;
+      position: relative;
+      background: #fff;
+      border: 1px solid #dcdcdc;
+      border-radius: 5px;
+      padding: 1px 10px;
+      width: 100%;
+      max-width: 300px;
+      margin-left: 100px;
 
-        input {
-          flex-grow: 1;
-          border: none;
-          outline: none;
-          padding-right: 30px;
-          font-size: 13px;
-          color: #666;
+      input {
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        padding-right: 30px;
+        font-size: 13px;
+        color: #666;
 
-          &::placeholder {
-            color: #a9a9a9;
-            font-style: italic;
-          }
+        &::placeholder {
+          color: #a9a9a9;
+          font-style: italic;
         }
       }
 
@@ -57,125 +60,130 @@
           fill: black;
         }
       }
-
-      .search-results-count {
-        margin-left: 20px;
-        white-space: nowrap;
-      }
     }
 
-    .category-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+    .search-results-count {
+      margin-left: 20px;
+      white-space: nowrap;
+    }
+  }
 
-      button {
-        padding: 5px 10px;
-        border: 1px solid #ddd;
-        background-color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+  .category-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* adjust this value if needed */
+    margin-bottom: 20px;
+    margin-top: 20px;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .category-tabs button {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.8rem;
+    color: #666;
+  
+    &:hover {
+      background-color: #f8f8f8;
+    }
+  }
+  
+  .category-tabs .category-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    color: #666;
+  }
 
-        &:hover {
-          background-color: #f8f8f8;
-        }
+  h5 {
+    font-weight: bold;
+    color: #333;
+    margin-top: 80px;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .search-courses {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 10px;
+
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      max-width: 600px;
+      margin: 5px;
+
+      &:hover {
+        transform: translateY(-10px);
       }
 
-      .category-toggle {
+      .card-image {
+        width: 100%;
+        height: 100px;
+        display: block;
+      }
+
+      .card-content {
+        padding: 6px;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 30px;
-        height: 30px;
-        margin-left: auto;
-      }
-    }
+        flex-direction: column;
+        height: 100%;
 
-    h5 {
-      font-weight: bold;
-      color: #333;
-      margin-top: 80px;
-    }
-
-    p {
-      font-size: 0.875rem;
-      color: #666;
-      margin: 0;
-    }
-
-    .search-courses {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      margin-bottom: 10px;
-
-      .card {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: transform 0.3s ease;
-        max-width: 600px;
-        margin: 5px;
-
-        &:hover {
-          transform: translateY(-10px);
+        .card-title {
+          font-size: 0.7rem;
+          font-weight: bold;
+          color: #333;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          min-height: 1.5rem;
         }
 
-        .card-image {
-          width: 100%;
-          height: 100px;
-          display: block;
-        }
-
-        .card-content {
-          padding: 6px;
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-
-          .card-title {
-            font-size: 0.7rem;
-            font-weight: bold;
-            color: #333;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            min-height: 1.5rem;
-          }
-
-          .card-instructor {
-            font-size: 0.6rem;
-            color: #666;
-          }
-
-          .card-price {
-            font-size: 0.7rem;
-            color: #ff6347;
-            font-weight: 500;
-            margin-top: auto;
-          }
-        }
-
-        .star-ratings {
-          display: flex;
-          align-items: center;
+        .card-instructor {
           font-size: 0.6rem;
+          color: #666;
+        }
 
-          .star-ratings-fill {
-            color: #ffcd3c;
-          }
+        .card-price {
+          font-size: 0.7rem;
+          color: #ff6347;
+          font-weight: 500;
+          margin-top: auto;
+        }
+      }
 
-          .star-ratings-base {
-            color: #ccc;
-            position: absolute;
-          }
+      .star-ratings {
+        display: flex;
+        align-items: center;
+        font-size: 0.6rem;
+
+        .star-ratings-fill {
+          color: #ffcd3c;
+        }
+
+        .star-ratings-base {
+          color: #ccc;
+          position: absolute;
         }
       }
     }

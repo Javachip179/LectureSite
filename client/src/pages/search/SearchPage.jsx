@@ -73,19 +73,14 @@ const SearchPage = () => {
       'Redux',
       '일반',
       'AWS',
-    ];
-
-    const moreCategories = [
       'REST API',
       'IoT',
       'Socket.io',
       'JWT',
-      '하이브리드 앱',
       'IONIC',
-      'C#',
-      'PostgreSQL',
-      'Docker',
     ];
+
+    const moreCategories = ['PostgreSQL', 'Docker', 'C#', '하이브리드 앱'];
 
     return (
       <div className='category-tabs'>
@@ -104,32 +99,35 @@ const SearchPage = () => {
   };
 
   return (
-    <div className='search-page-container'>
-      <img className='banner-container' src={Banner} alt='banner' />
-    </div>
-
-    <div className='search-content'>
-      <h5>검색 강의</h5>
-      <div className='search-header'>
-        <div className='search-results-count'>
-          "{searchQuery}"에 대한 강의 결과 ({courseCount}개)
-        </div>
-        <div className='search-bar'>
-          <input
-            type='text'
-            placeholder=' '
-            value={searchQuery}
-            onChange={handleSearchInputChange}
-          />
-          <button onClick={handleSearch}>
-            <Search />
-          </button>
-        </div>
-        <CategoryTabs />
+    <div className='search-page-wrapper'>
+      <div className='search-page-container'>
+        <img className='banner-container' src={Banner} alt='banner' />
       </div>
 
-      <div className='search-courses'>
-        <div className='card'>
+      <div className='search-content'>
+        <h3>검색 강의</h3>
+        <div className='search-header'>
+          <div className='search-top-row'>
+            <div className='search-results-count'>
+              "{searchQuery}"에 대한 강의 결과 ({courseCount}개)
+            </div>
+            <div className='search-bar'>
+              <input
+                type='text'
+                placeholder='검색어 입력'
+                value={searchQuery}
+                onChange={handleSearchInputChange}
+              />
+              <button onClick={handleSearch}>
+                <Search />
+              </button>
+            </div>
+          </div>
+          <CategoryTabs />
+        </div>
+
+        <div className='search-courses'>
+          <div className='card'>
             <img
               className='card-image'
               src='https://cdn.inflearn.com/public/courses/329963/cover/26550c58-624a-41c8-86dc-fea75b6c3b22/thumbnail-frontnew.png'
@@ -210,6 +208,7 @@ const SearchPage = () => {
               <StarRatings rating={5.0} />
             </div>
           </div>
+        </div>
       </div>
     </div>
   );

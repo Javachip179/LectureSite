@@ -8,19 +8,20 @@ import {
 
 import SignUp from "./pages/auth/signUp/SignUp"
 import SignIn from "./pages/auth/signIn/SignIn"
-import Write from "./pages/dodo/Write"
-import Home from "./pages/home/Home"
-import Single from "./pages/dodo/Single"
+import Home from './pages/home/Home';
 import Search from './pages/search/SearchPage';
-import Courses from './pages/dodo/Courses';
-import OnlineStudy from './pages/dodo/OnlineStudy';
 import Profile from './pages/mypage/profile/profile';
-import MyOnline from './pages/dodo/MyOnline';
 import Cart from './pages/cart/Cart';
 import Payment from './pages/mypage/payment/Payment';
 import Mypage from './pages/mypage/Mypage';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+
+import LecturesInfo from './pages/lecturesinfo/LectureInfo';
+import LecturesTOC from './pages/lecturesinfo/lecturesTOC/LecturesTOC';
+import Comment from './pages/lecturesinfo/comment/Comment';
+import Question from './pages/lecturesinfo/question/Question';
+import WatchLecture from './pages/lecturesinfo/watchLecture/WatchLecture';
 
 const Layout = () => {
   return (
@@ -42,20 +43,8 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: '/post/:id',
-        element: <Single />,
-      },
-      {
-        path: '/write',
-        element: <Write />,
-      },
-      {
         path: '/search',
         element: <Search />,
-      },
-      {
-        path: '/courses',
-        element: <Courses />,
       },
       {
         path: '/mypage',
@@ -70,16 +59,32 @@ const router = createBrowserRouter([
         element: <Payment />,
       },
       {
-        path: '/myonline',
-        element: <MyOnline />,
-      },
-      {
         path: '/cart',
         element: <Cart />,
       },
       {
         path: '/payment',
         element: <Payment />,
+      },
+      {
+        path: '/lecturesinfo',
+        element: <LecturesInfo />,
+      },
+      {
+        path: '/lecturesTOC',
+        element: <LecturesTOC />,
+      },
+      {
+        path: '/comment',
+        element: <Comment />,
+      },
+      {
+        path: '/question',
+        element: <Question />,
+      },
+      {
+        path: '/watchLecture',
+        element: <WatchLecture />,
       },
     ],
   },
@@ -90,10 +95,6 @@ const router = createBrowserRouter([
   {
     path: '/signIn',
     element: <SignIn />,
-  },
-  {
-    path: '/onlinestudy',
-    element: <OnlineStudy />,
   },
 ]);
 
