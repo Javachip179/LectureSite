@@ -90,6 +90,7 @@ const LectureInfo = () => {
 
       <div className='lecture-content'>
         <div className='lecture-left-wrapper'>
+          {/* 강의 설명 */}
           <h2>초급자를 위한 준비물</h2>
           <p>
             Next.js는 프론트엔드부터 서버까지 만들 수 있는 React 기반
@@ -118,6 +119,13 @@ const LectureInfo = () => {
               <p>
                 <FaCheck className='checkmark-icon' /> React
               </p>
+            </div>
+          </div>
+
+          {/* 강사소개 */}
+          <div className='lecture-instructor'>
+            <div className='lecture-instructor-header'>
+              <div className='lecture-instructor-content'></div>
             </div>
           </div>
         </div>
