@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './style.scss'; // 가정한 SCSS 파일입니다. 실제 파일 경로에 맞게 수정해주세요.
-import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const Cart = () => {
   // 강의 목록과 선택된 강의들의 상태를 관리합니다.

@@ -1,0 +1,225 @@
+.lecture-info {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+
+  .lecture-header {
+    display: flex;
+    align-items: center;
+    justify-content: center; // 추가: 자식 요소들을 가로 중앙 정렬합니다.
+    background-color: #4682B4;
+    width: 100%;
+    height: 350px;
+
+    .lecture-course {
+      display: flex;
+      position: relative; // 절대 위치의 기준점을 설정합니다.
+      align-items: flex-start; // 세로 중앙 정렬을 위해 사용합니다.
+      justify-content: flex-start; // 추가: 자식 요소들을 가로 중앙 정렬합니다.
+      width: 1240px;
+      height: 250px;
+      
+      .lecture-image {
+        position: relative; // 상대 위치 지정
+        flex: 2;
+        img {
+          max-width: 400px;
+          height: 250px;
+          border-radius: 10px;
+        }
+      }
+
+      .lecture-title {
+        flex-grow: 1; // 제목이 남은 공간을 모두 차지하도록 합니다.
+        display: flex;
+        flex-direction: column; // 제목 내부의 텍스트와 태그를 위아래로 정렬합니다.
+        justify-content: center; // 세로 중앙 정렬
+        align-items: flex-start; // 제목 텍스트를 왼쪽 정렬합니다.
+        // position: absolute; 삭제
+        padding-left: 20px; // 이미지와 제목 사이의 간격을 추가합니다.
+      
+      h3 {
+        // 필요한 스타일을 추가합니다. 예를 들어 글자 크기나, 굵기 등입니다.
+      }
+      
+      .lecture-instructor {
+        // 강사 이름에 대한 스타일을 추가합니다.
+      }
+
+      .lecture-rating {
+        // 평점 부분에 대한 스타일을 추가합니다.
+      }
+
+      .lecture-tag {
+        // 태그 부분에 대한 스타일을 추가합니다.
+        span {
+          // 각 태그에 대한 스타일을 추가합니다.
+        }
+      }
+    }
+  }
+}
+
+.lecture-nav-menu {
+  width: 100%; // 이 div가 전체 너비를 차지하도록 합니다.
+  border-bottom: 1px solid #ccc;
+}
+
+.lecture-nav-container {
+  display: flex;
+  align-items: flex-end;
+  height: 45px;
+  overflow-x: auto;
+  white-space: nowrap;
+  list-style: none;
+  padding: 0 32px 0 16px;
+}
+
+.lecture-nav-list {
+  line-height: 1.47;
+  letter-spacing: -.3px;
+  font-size: 15px;
+  font-weight: 500;
+  display: inline-block;
+  min-height: 33px;
+  padding: 15px 0 6px;
+  color: #abb0b5;
+  border-bottom: 2px inset transparent;
+
+  &:active{
+    color: #1b1c1d;
+    border-bottom-color: #1b1c1d;
+    font-weight: 700;
+  }
+}
+
+.lecture-content {
+  width: 1240px;
+  display: flex; // lecture-content를 플렉스 컨테이너로 설정합니다.
+  justify-content: space-between; // 자식 요소인 left와 right wrapper 사이의 간격을 균등하게 배분합니다.
+  align-items: flex-start; // 자식 요소를 시작점에서 정렬합니다.
+
+
+  .lecture-left-wrapper {
+    flex: 1; // 남은 공간을 모두 차지합니다.
+    padding-right: 20px; // 오른쪽 여백을 추가합니다.
+    width: 800px; // 최대 너비를 설정합니다. 디자인에 맞게 조정 가능합니다.
+
+    h2 {
+      font-size: 22px; // 제목의 글꼴 크기를 설정합니다.
+      margin-bottom: 16px; // 제목 아래의 마진을 설정합니다.
+      color: #343a40; // 제목의 글꼴 색상을 설정합니다.
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    p {
+      font-size: 16px; // 문단의 글꼴 크기를 설정합니다.
+      line-height: -.5px; // 문단의 줄 높이를 설정합니다.
+      margin-bottom: 16px; // 문단 아래의 마진을 설정합니다.
+      color: #666; // 문단의 글꼴 색상을 설정합니다.
+      font-weight: 500;
+    }
+
+    .fixed-body {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+    padding: 32px 24px 32px 16px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    background-color: #fff;
+
+      .fixed-body-title {
+    flex-shrink: 0;
+    flex-basis: 130px;
+    margin-right: 16px;
+    line-height: 1.39;
+    letter-spacing: -.3px;
+    color: #343a40;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+
+        .fa-thumbs-up { // react-icons 아이콘에 대한 클래스명
+          font-size: 24px; // 아이콘 크기를 설정합니다.
+          color: #f00; // 아이콘 색상을 설정합니다.
+          margin-right: 8px; // 아이콘과 텍스트 사이의 여백을 설정합니다.
+        }
+
+        p {
+          font-size: 18px; // 텍스트의 글꼴 크기를 설정합니다.
+          color: #333; // 텍스트의 글꼴 색상을 설정합니다.
+          margin: 0; // 텍스트의 마진을 제거합니다.
+        }
+      }
+
+      .fixed-body-list {
+        p {
+          display: flex;
+          align-items: center;
+          margin-bottom: 8px; // 리스트 아이템 아래의 마진을 설정합니다.
+
+          .checkmark-icon { // checkmark 아이콘에 대한 클래스명
+            font-size: 16px; // 아이콘 크기를 설정합니다.
+            color: green; // 아이콘 색상을 설정합니다.
+            margin-right: 8px; // 아이콘과 텍스트 사이의 여백을 설정합니다.
+          }
+        }
+      }
+    }
+  }
+
+  .lecture-right-wrapper {
+    max-width: 410px;
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      width: 100%; // 혹은 원하는 너비
+      margin: auto; // 가운데 정렬을 위함
+      background: #fff;
+      width: 265px;
+      height: 450px;
+  
+      .card-header {
+        padding: 16px;
+        background: #eee;
+        border-bottom: 1px solid #ccc;
+        font-size: 20px; // 헤더의 글씨 크기
+        text-align: center; // 헤더의 텍스트 가운데 정렬
+      }
+  
+      .card-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column; // 세로로 버튼 정렬
+        gap: 10px; // 버튼 사이의 간격
+  
+        .btn {
+          padding: 10px 15px;
+          border: none;
+          border-radius: 4px;
+          color: #fff;
+          font-weight: bold;
+          cursor: pointer;
+          text-transform: uppercase; // 텍스트 대문자
+  
+          &.btn-primary {
+            background: #4682B4; // 주 버튼 색상
+          }
+  
+          &.btn-secondary {
+            background: #4caf50; // 보조 버튼 색상
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+}
