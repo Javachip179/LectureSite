@@ -36,6 +36,14 @@
       padding: 10px;
       margin-bottom: 10px;
       width: 380px;
+
+      &:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.1rem rgba(0,123,255,.25);
+        }
     }
 
     .password-container {

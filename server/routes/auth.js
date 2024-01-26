@@ -6,24 +6,6 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 router.use(bodyParser.json());
 
-router.get('/signIn', (req, res) => {
-  try {
-    res.render('signIn.ejs');
-  } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-router.get('/signUp', (req, res) => {
-  try {
-    res.render('signUp.ejs');
-  } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 //회원가입
 router.post('/signUp', (req, res) => {
   const email = req.body.UserEmail;

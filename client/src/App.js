@@ -16,7 +16,7 @@ import Payment from './pages/mypage/payment/Payment';
 import Mypage from './pages/mypage/Mypage';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-
+import LectureList from './pages/category/LectureList';
 import LecturesInfo from './pages/lecturesinfo/LectureInfo';
 import LecturesTOC from './pages/lecturesinfo/lecturesTOC/LecturesTOC';
 import Comment from './pages/lecturesinfo/comment/Comment';
@@ -55,6 +55,10 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
+        path: '/lectureList',
+        element: <LectureList />,
+      },
+      {
         path: '/payment',
         element: <Payment />,
       },
@@ -67,7 +71,7 @@ const router = createBrowserRouter([
         element: <Payment />,
       },
       {
-        path: '/lecturesInfo',
+        path: '/lecturesInfo/:lectureID',
         element: <LecturesInfo />,
       },
       {
@@ -93,7 +97,7 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
-    path: '/watchLecture',
+    path: '/watchLecture/:lectureID',
     element: <WatchLecture />,
   },
 ]);

@@ -20,12 +20,16 @@ const SignUp = () => {
   const [nameError, setNameError] = useState('');
   const [cellphoneError, setCellPhoneError] = useState('');
   const [passwordShown, setPasswordShown] = useState(false);
+  const [passwordCheckShown, setPasswordCheckShown] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const togglePasswordVisibility = () => {
     setPasswordShown(!passwordShown);
   };
 
+  const togglePasswordCheckVisibility = () => {
+    setPasswordCheckShown(!passwordCheckShown);
+  };
   const handlePasswordFocus = () => {
     setIsPasswordFocused(true); // Show the message
   };
@@ -246,7 +250,7 @@ const SignUp = () => {
 
         // API 호출에 대한 후속 처리 추가
         console.log('회원가입 성공:', response);
-        alert(`${name}님, 환영합니다!`);
+        alert(`회원가입을 환영합니다!`);
         navigate('/');
       } catch (error) {
         console.error('회원가입 중 오류 발생:', error);
@@ -294,7 +298,7 @@ const SignUp = () => {
 
           <div className='input-container'>
             <input
-              type={passwordShown ? 'text' : 'passwordCheck'}
+              type={passwordCheckShown ? 'text' : 'password'}
               placeholder='비밀번호 확인'
               className='signup-input'
               value={passwordCheck}
@@ -303,10 +307,10 @@ const SignUp = () => {
             />
             <button
               type='button'
-              onClick={togglePasswordVisibility}
+              onClick={togglePasswordCheckVisibility}
               className='password-toggle'
             >
-              {passwordShown ? <FaEyeSlash /> : <FaEye />}
+              {passwordCheckShown ? <FaEyeSlash /> : <FaEye />}
             </button>
             {passwordMatchError && (
               <p className='error-message'>{passwordMatchError}</p>
