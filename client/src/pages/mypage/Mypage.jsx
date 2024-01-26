@@ -2,7 +2,7 @@ import React from 'react';
 import './style.scss'; // SCSS 스타일 파일을 포함시킵니다.
 import profileimage from '../../img/it.png'; // 프로필 이미지를 포함시킵니다.
 import { NavLink } from 'react-router-dom';
-import { MdPlayCircleOutline } from 'react-icons/md';
+import { FaRegPlayCircle } from 'react-icons/fa';
 
 const MyPage = () => {
   // 강의 데이터와 진행률을 포함한 하드코딩된 데이터
@@ -86,7 +86,7 @@ const MyPage = () => {
               className='watch-video-button'
               onClick={() => watchVideo(course.id)}
             >
-              <MdPlayCircleOutline className='play-icon' />
+              <FaRegPlayCircle className='play-icon' />
             </button>
           </div>
         ))}

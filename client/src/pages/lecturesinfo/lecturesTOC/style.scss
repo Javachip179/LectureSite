@@ -1,0 +1,92 @@
+.lectures-toc {
+  border-bottom: 1px solid #ddd;
+  .course-title {
+    font-size: 20px; // 예시 사이즈, 실제 사이즈에 맞게 조정 필요
+    color: #000; // 글자 색상, 디자인에 맞게 조정 필요
+    margin-bottom: 10px; // 간격, 디자인에 맞게 조정 필요
+  }
+
+    .details {
+      font-size: 12px; // 예시 사이즈, 실제 사이즈에 맞게 조정 필요
+      color: #666; // 글자 색상, 디자인에 맞게 조정 필요
+      margin-left: 10px;
+    }
+
+    .description {
+      font-size: 14px; // 예시 사이즈, 실제 사이즈에 맞게 조정 필요
+      color: #666; // 글자 색상, 디자인에 맞게 조정 필요
+      margin-top: 5px; // 간격, 디자인에 맞게 조정 필요'
+      margin-bottom: 20px;
+    }
+
+    .section-container {
+      margin-bottom: 10px;
+    }
+
+  .toc-section {
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+
+
+    &:first-child {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      overflow: hidden; // 자식 요소들이 모서리를 무시하지 않도록 함
+ 
+    }
+    &:last-child {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      overflow: hidden; // 자식 요소들이 모서리를 무시하지 않도록 함
+      border-bottom: 1px solid #ddd;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 15px;
+      background-color: #f8f9fa;
+
+      .header-content { // 새로운 div 스타일
+        display: flex;
+        align-items: center;
+
+        .chevron-icon {
+         margin-right: 10px;
+        }
+
+        .section-name {
+          font-weight: bold;
+          margin-right: 10px; // chevron-icon과의 간격 조정
+        }
+      }
+
+      .section-info {
+        font-size: 0.85em;
+        color: #666;
+      }
+    }
+
+    .lecture-items {
+      .lecture-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        border-top: 1px solid #ddd; // 강의 아이템에 테두리 추가
+
+        .play-icon {
+          margin-right: 10px;
+        }
+
+        .lecture-time {
+          font-size: 0.85em;
+          color: #666;
+        }
+      }
+    }
+  }
+}

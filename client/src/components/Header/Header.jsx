@@ -1,18 +1,35 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ITTLogo from '../../img/allitone.png';
 import './style.scss';
 import SignIn from '../../pages/auth/signIn/SignIn';
 
 const Header = () => {
   const [showSignIn, setShowSignIn] = useState(false);
+  const [isSticky, setIsSticky] = useState(false);
 
   const toggleSignIn = () => {
     setShowSignIn(!showSignIn);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // window.scrollY는 수직으로 얼마나 스크롤 되었는지를 반환합니다.
+      // 헤더의 높이보다 더 스크롤 되었다면, 헤더를 고정시키기 위해 isSticky를 true로 설정합니다.
+      setIsSticky(window.scrollY > 0);
+    };
+
+    // 스크롤 이벤트 리스너 등록
+    window.addEventListener('scroll', handleScroll);
+
+    // 컴포넌트가 언마운트될 때 리스너를 정리합니다.
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <div className='header'>
+    <div className={isSticky ? 'header sticky' : 'header'}>
       <div className='container'>
         <div className='logo-container'>
           <Link to='/'>

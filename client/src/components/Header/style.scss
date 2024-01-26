@@ -1,4 +1,5 @@
-// style.scss
+
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -7,6 +8,20 @@
   padding: 10px;
   border-bottom: 1px solid white;
   box-shadow: 0 8px 6px -7px rgba(0, 0, 0, 0.1);
+  height: 30px;
+  transition: all 0.3s; // 부드러운 전환 효과를 위해 추가
+
+
+  &.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #fff; // 배경색을 지정하여 컨텐츠가 헤더 아래로 보이지 않도록 합니다.
+    border-bottom: 1px solid #ddd;
+  }
+
 
   .container {
     max-width: 1240px;

@@ -82,10 +82,6 @@ const router = createBrowserRouter([
         path: '/question',
         element: <Question />,
       },
-      {
-        path: '/watchLecture',
-        element: <WatchLecture />,
-      },
     ],
   },
   {
@@ -95,6 +91,10 @@ const router = createBrowserRouter([
   {
     path: '/signIn',
     element: <SignIn />,
+  },
+  {
+    path: '/watchLecture',
+    element: <WatchLecture />,
   },
 ]);
 
