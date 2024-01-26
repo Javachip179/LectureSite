@@ -3,25 +3,26 @@ const mysql = require('../database/mysql');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 router.use(bodyParser.json());
 
-// router.get('/signIn', (req, res) => {
-//   try {
-//     res.render('signIn.ejs');
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+router.get('/signIn', (req, res) => {
+  try {
+    res.render('signIn.ejs');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
-// router.get('/signUp', (req, res) => {
-//   try {
-//     res.render('signUp.ejs');
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+router.get('/signUp', (req, res) => {
+  try {
+    res.render('signUp.ejs');
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 //회원가입
 router.post('/signUp', (req, res) => {
@@ -86,46 +87,56 @@ router.post('/signUp', (req, res) => {
 // 로그인
 router.post('/signIn', async (req, res) => {
   try {
+    const key = process.env.JWT_SECRET;
     const email = req.body.UserEmail;
     const password = req.body.Password;
-    console.log('Email: ' + email + ' Password: ' + password);
+    // console.log("이메일: " + email + " 비밀번호: " + password);
 
     mysql.getConnection((error, conn) => {
       if (error) {
         console.log(error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send('내부 서버 오류');
         return;
       }
 
       conn.query(
-        'SELECT u.UserEmail, u.Password FROM Users u WHERE u.UserEmail = ?',
+        'SELECT u.UserID, u.UserEmail, u.UserName, u.ProfileImage, u.Password FROM Users u WHERE u.UserEmail = ?',
         [email],
         (err, result) => {
-          console.log(result);
+          // console.log(result);
           if (err) {
             console.log(err);
-            res.status(500).send('Internal Server Error');
+            res.status(500).send('내부 서버 오류');
             return;
           }
 
           if (result.length === 0) {
-            console.log('cannot find user');
-            res.status(404).send('User not found');
+            console.log('사용자를 찾을 수 없음');
+            res.status(404).send('사용자를 찾을 수 없음');
             return;
           }
 
           const hashedPassword = result[0].Password;
 
           if (bcrypt.compareSync(password, hashedPassword)) {
-            console.log('success');
-            req.session.email = email;
+            const token = jwt.sign({ userID: result[0].UserID }, key, {
+              expiresIn: '1h',
+            });
 
-            if (req.session.email) {
-              res.redirect('/');
-            }
+            // 토큰을 쿠키에 저장
+            res.cookie('userToken', token);
+
+            // 비밀번호를 제외한 사용자 정보만 응답으로 보냄
+            const userData = {
+              UserID: result[0].UserID,
+              UserEmail: result[0].UserEmail,
+              UserName: result[0].UserName,
+              ProfileImage: result[0].ProfileImage,
+            };
+            res.send({ success: true, userData });
           } else {
-            console.log('fail');
-            res.status(401).send('Invalid password');
+            console.log('실패');
+            res.status(401).send('잘못된 비밀번호');
           }
 
           conn.release();
@@ -134,24 +145,145 @@ router.post('/signIn', async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send('내부 서버 오류');
   }
 });
 
 //로그아웃
 router.get('/logout', (req, res) => {
   try {
-    req.session.destroy(err => {
-      if (err) {
-        console.log(err);
-        res.status(500).send('Internal Server Error');
+    // 클라이언트로부터 쿠키를 얻기 위해 request.cookies 사용
+    const cookies = req.cookies;
+
+    if (cookies !== null) {
+      for (const userToken in cookies) {
+        if (cookies.hasOwnProperty(userToken)) {
+          // 쿠키를 삭제하는 방식으로 수정
+          res.clearCookie(userToken);
+        }
+      }
+    }
+
+    // 클라이언트에게 로그아웃 성공을 알리는 응답을 보냄
+    res.status(200).send('Logout successful');
+  } catch (error) {
+    console.error('로그아웃 중 오류:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// 닉네임 중복 검사
+router.get('/duplication-nickname', (req, res) => {
+  const nickname = req.query.nickname;
+  console.log(nickname);
+
+  try {
+    mysql.getConnection((error, conn) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('내부 서버 오류');
         return;
       }
-      res.redirect('/');
+
+      conn.query(
+        'SELECT UserNickname FROM Users WHERE UserNickname = ?',
+        [nickname],
+        (err, result) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('내부 서버 오류');
+            return;
+          }
+          if (result.length > 0) {
+            // 닉네임이 이미 존재함
+            res.json({ isDuplicate: true });
+          } else {
+            // 닉네임이 중복되지 않음
+            res.json({ isDuplicate: false });
+          }
+          conn.release();
+        }
+      );
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal Server Error');
+    console.error('닉네임 중복 확인 중 오류 발생:', error);
+    res.status(500).send('내부 서버 오류');
+  }
+});
+
+//전화번호 중복 체크
+router.get('/duplication-cellphone', async (req, res) => {
+  const cellphone = req.query.cellphone;
+  console.log(cellphone);
+
+  try {
+    mysql.getConnection((error, conn) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('내부 서버 오류');
+        return;
+      }
+      conn.query(
+        'SELECT u.UserCellPhone FROM Users u WHERE u.UserCellPhone = ?',
+        [cellphone],
+        (err, result) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('내부 서버 오류');
+            return;
+          }
+          if (result.length > 0) {
+            // 전화번호가 이미 존재함
+            res.json({ isDuplicate: true });
+          } else {
+            // 전화번호가 중복되지 않음
+            res.json({ isDuplicate: false });
+          }
+          conn.release();
+        }
+      );
+    });
+  } catch (error) {
+    console.error('전화번호 중복 확인 중 오류 발생:', error);
+    res.status(500).send('내부 서버 오류');
+  }
+});
+
+//이메일 중복 체크
+router.get('/duplication-email', async (req, res) => {
+  const email = req.query.email;
+  console.log(email);
+
+  try {
+    mysql.getConnection((error, conn) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('내부 서버 오류');
+        return;
+      }
+      conn.query(
+        'SELECT u.UserEmail FROM Users u WHERE u.UserEmail = ?',
+        [email],
+        (err, result) => {
+          if (err) {
+            console.error(err);
+            res.status(500).send('내부 서버 오류');
+            return;
+          }
+          if (result.length > 0) {
+            // 이메일이 이미 존재함
+            res.json({ isDuplicate: true });
+          } else {
+            // 이메일이 중복되지 않음
+            res.json({ isDuplicate: false });
+          }
+          conn.release();
+        }
+      );
+    });
+  } catch (error) {
+    console.error('전화번호 중복 확인 중 오류 발생:', error);
+    res.status(500).send('내부 서버 오류');
   }
 });
 

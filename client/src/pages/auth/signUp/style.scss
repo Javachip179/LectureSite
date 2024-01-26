@@ -32,33 +32,77 @@
     font-size: 0.9rem;
 
   }
-  
-  @keyframes slideText {
-    0% {
-      left: 100%; // 시작 지점
-    }
-    100% {
-      left: -100%; // 끝 지점
-    }
-  }
 
   .signup-form {
     display: flex;
     flex-direction: column;
-    
-    .signup-input {
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 12px;
-      margin-bottom: 15px;
-      font-size: 0.9rem;
-    }
 
-    .signup-question {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
+    .input-container {
+      position: relative;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center; // This ensures vertical alignment
+
+      .signup-input {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 12px;
+        font-size: 0.9rem;
+        flex-grow: 1;
+        padding-right: 40px; // Make room for the eye icon
+  
+        &:focus {
+          color: #495057;
+          background-color: #fff;
+          border-color: #80bdff;
+          outline: 0;
+          box-shadow: 0 0 0 0.1rem rgba(0,123,255,.25);
+          }
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 10px; // Adjust as necessary
+        height: 100%;
+        border: none;
+        background: none;
+        cursor: pointer;
+    
+        &:focus {
+          outline: none; // Removes the focus outline to keep the design clean
+        }
+        
+        // Adjust the size as necessary
+        svg {
+          height: 15px;
+          width: 15px;
+        }
+      }
+  
+      .error-message {
+        position: absolute;
+        bottom: -20px; // Adjust this value as needed
+        left: 0;
+        width: 100%;
+        color: #ff0000;
+        padding: 5px;
+        margin: 0;
+        font-size: 11px;
+      }
+
+      .focused-message {
+        position: absolute;
+        bottom: -20px; // Adjust this value as needed
+        left: 0;
+        width: 100%;
+        color: #495057;
+        padding: 5px;
+        margin: 0;
+        font-size: 11px;
+      }
     }
+    
+
 
     .signin-link {
       color: #4682B4; // Or the color of your choice

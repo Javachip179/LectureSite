@@ -1,9 +1,10 @@
 const express = require('express');
-const session = require('express-session');
+const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/auth');
 const homeRoutes = require('./routes/main');
@@ -14,19 +15,19 @@ const cartRoutes = require('./routes/cart');
 const paymentRoutes = require('./routes/payment');
 const lectureRoutes = require('./routes/lectures');
 
-app.use(cors());
+// 미들웨어 등록
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.json());
 
-app.use(
-  session({
-    secret: 'session123',
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 app.use('/', homeRoutes);
 app.use('/api/auth', authRoutes);
