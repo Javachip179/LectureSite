@@ -36,9 +36,43 @@ router.get('/all', (req, res) => {
   });
 });
 
-//특정 카테고리 클릭시 해당 카테고리의 강의들을 평점순으로 출력
-router.get('/lectures/:categoryID', (req, res) => {
-  const categoryID = req.params.categoryID;
+router.get('/sub', (req, res) => {
+  const categoryId = req.query.categoryId;
+
+  // categoryId의 유효성 검사
+  if (!categoryId) {
+    res.status(400).send('Category ID is required');
+    return;
+  }
+
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    const query = `
+        SELECT * 
+        FROM Subcategory 
+        WHERE CategoryID = ?;
+    `;
+
+    conn.query(query, [categoryId], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      } else {
+        res.json(results);
+      }
+
+      conn.release();
+    });
+  });
+});
+
+//세부 카테고리 클릭시 해당 카테고리의 강의들을 평점순으로 출력
+router.get('/lectures/:SubcategoryID', (req, res) => {
+  const SubcategoryID = req.params.SubcategoryID;
 
   // MySQL 연결
   mysql.getConnection((error, conn) => {
@@ -50,28 +84,29 @@ router.get('/lectures/:categoryID', (req, res) => {
 
     // SQL 쿼리 실행
     const query = `
-        SELECT 
-          l.LectureID,
-          l.LectureImageURL,
-          l.Title,
-          AVG(c2.Rating) AS AverageRating,
-          l.LecturePrice 
-        FROM 
-          Lectures l
-        JOIN
-          LectureCategory lc ON l.LectureID = lc.LectureID
-        JOIN 
-          Category c ON c.CategoryID = lc.CategoryID
-        JOIN 
-          Comments c2 ON c2.LectureID = l.LectureID
-        WHERE 
-          lc.CategoryID = ?
-        GROUP BY 
-          l.LectureID
-        ORDER BY AverageRating DESC ;
-      `;
+    SELECT 
+      l.LectureID,
+      l.LectureImageURL,
+      l.Title,
+      AVG(c.Rating) AS AverageRating,
+      l.LecturePrice 
+    FROM 
+      Lectures l
+    JOIN
+      LectureSubcategory ls ON l.LectureID = ls.LectureID
+    JOIN 
+      Subcategory s ON s.SubcategoryID = ls.SubcategoryID
+    LEFT JOIN 
+      Comments c ON c.LectureID = l.LectureID
+    WHERE 
+      s.SubcategoryID = ?
+    GROUP BY 
+      l.LectureID
+    ORDER BY 
+      AverageRating DESC;
+    `;
 
-    conn.query(query, [categoryID], (error, results) => {
+    conn.query(query, [SubcategoryID], (error, results) => {
       if (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

@@ -13,30 +13,49 @@ import { FaShoppingCart } from 'react-icons/fa';
 
 const Header = () => {
   const { currentUser, logout } = useContext(AuthContext);
-
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [searchWord, setSearchWord] = useState(null);
   const [categoryData, setCategoryData] = useState([]);
+  const [subCategories, setSubCategories] = useState({});
   const [isSticky, setIsSticky] = useState(false);
-  const navigate = useNavigate(); // useNavigate 사용
+  const navigate = useNavigate();
+  const [activeCategoryId, setActiveCategoryId] = useState(null);
+
+  const fetchSubCategories = async categoryId => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/api/categories/sub?categoryId=${categoryId}`,
+        { withCredentials: true }
+      );
+      setSubCategories(prev => ({ ...prev, [categoryId]: response.data }));
+    } catch (error) {
+      console.error('서브 카테고리 정보를 불러오는 중 오류 발생:', error);
+    }
+  };
+
+  // 메인 카테고리를 가져오는 함수
+  const fetchMainCategories = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/api/categories/all`, {
+        withCredentials: true,
+      });
+      setCategoryData(response.data);
+    } catch (error) {
+      console.error('메인 카테고리 정보를 불러오는 중 오류 발생:', error);
+    }
+  };
 
   useEffect(() => {
+    // 토큰을 확인하여 로그인 상태를 설정합니다.
     const token = Cookies.get('userToken');
     setIsLoggedIn(!!token);
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}/api/categories/all`, {
-          withCredentials: true,
-        });
-        setCategoryData(response.data);
-      } catch (error) {
-        console.error('강의 정보를 불러오는 중 오류 발생:', error);
-      }
-    };
-    fetchData();
+    // 메인 카테고리를 가져옵니다.
+    fetchMainCategories();
+
+    // 다른 의존성이나 상태에 따라 fetchSubCategories를 호출할 수도 있습니다.
   }, [isLoggedIn]);
 
   const toggleProfileDropdown = () => {
@@ -64,6 +83,7 @@ const Header = () => {
       console.error('로그아웃 중 오류:', error);
     }
   };
+
   const onInputChange = e => {
     const newSearchWord = e.target.value;
     setSearchWord(newSearchWord);
@@ -74,27 +94,28 @@ const Header = () => {
     navigate('/search', { state: { searchWord: searchWord } });
   };
 
-  const onCategoryHandler = async (categoryId, categoryName) => {
+  const onSubCategoryHandler = async (SubcategoryID, SubcategoryName) => {
     navigate('/lectureList', {
-      state: { categoryID: categoryId, categoryName: categoryName },
+      state: { SubcategoryID: SubcategoryID, categoryName: SubcategoryName },
     });
   };
 
-  const onLogoClick = () => {
-    setSearchWord('');
+  const handleMouseEnterCategory = categoryId => {
+    setActiveCategoryId(categoryId);
+    fetchSubCategories(categoryId);
+  };
+
+  const handleMouseLeaveCategory = () => {
+    setActiveCategoryId(null);
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      // window.scrollY는 수직으로 얼마나 스크롤 되었는지를 반환합니다.
-      // 헤더의 높이보다 더 스크롤 되었다면, 헤더를 고정시키기 위해 isSticky를 true로 설정합니다.
       setIsSticky(window.scrollY > 0);
     };
 
-    // 스크롤 이벤트 리스너 등록
     window.addEventListener('scroll', handleScroll);
 
-    // 컴포넌트가 언마운트될 때 리스너를 정리합니다.
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -112,29 +133,39 @@ const Header = () => {
         </div>
 
         <div className='drop-down'>
-          {/* 드랍다운 토글 버튼 */}
           <div className='dropdown-toggle'>강의</div>
-          {/* 드랍다운 컨텐츠 */}
           <div className='dropdown-content'>
-            {categoryData &&
-              categoryData.map(
-                (
-                  category // categoryData가 존재할 때만 map을 실행합니다.
-                ) => (
-                  <div
-                    key={category.CategoryID} // key prop을 추가하여 React 리스트 렌더링 성능 최적화
-                    className='dropdown-title'
-                    onClick={() =>
-                      onCategoryHandler(
-                        category.CategoryID,
-                        category.CategoryName
-                      )
-                    }
-                  >
-                    {category.CategoryName}
-                  </div>
-                )
-              )}
+            {categoryData.map(category => (
+              <div
+                key={category.CategoryID}
+                className='dropdown-title'
+                onMouseEnter={() =>
+                  handleMouseEnterCategory(category.CategoryID)
+                }
+                onMouseLeave={handleMouseLeaveCategory}
+              >
+                {category.CategoryName}
+                {activeCategoryId === category.CategoryID &&
+                  subCategories[category.CategoryID] && (
+                    <div className='sub-dropdown-content'>
+                      {subCategories[category.CategoryID].map(subCategory => (
+                        <div
+                          key={subCategory.SubcategoryID}
+                          className='sub-dropdown-title'
+                          onClick={() =>
+                            onSubCategoryHandler(
+                              subCategory.SubcategoryID,
+                              subCategory.SubcategoryName
+                            )
+                          }
+                        >
+                          {subCategory.SubcategoryName}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -161,34 +192,26 @@ const Header = () => {
                 onMouseEnter={toggleProfileDropdown}
                 onMouseLeave={closeProfileDropdown}
               >
-                <img src={UserIcon} alt='프로필 이미지' className='usericon' />
+                <img
+                  src={currentUser?.ProfileImage || UserIcon}
+                  alt='프로필 이미지'
+                  className='usericon'
+                />
                 {isProfileDropdownOpen && (
                   <div className='profile-dropdown'>
                     <div className='user-info'>
-                      <div className='dropdown-profile-container'>
-                        {currentUser && currentUser.ProfileImage !== null ? (
-                          <img
-                            src={currentUser.ProfileImage}
-                            alt='프로필 이미지'
-                            className='user-profile-image'
-                          />
-                        ) : (
-                          <img
-                            src={UserIcon}
-                            alt='프로필 이미지'
-                            className='user-profile-image'
-                          />
-                        )}
-                        {currentUser && (
-                          <div className='dropdown-profile-info'>
-                            <p className='dropdown-profile-nickname'>
-                              {currentUser.UserName}
-                            </p>
-                            <p className='dropdown-profile-email'>
-                              {currentUser.UserEmail}
-                            </p>
-                          </div>
-                        )}
+                      <img
+                        src={currentUser?.ProfileImage || UserIcon}
+                        alt='프로필 이미지'
+                        className='user-profile-image'
+                      />
+                      <div className='dropdown-profile-info'>
+                        <p className='dropdown-profile-nickname'>
+                          {currentUser?.UserNickname}
+                        </p>
+                        <p className='dropdown-profile-email'>
+                          {currentUser?.UserEmail}
+                        </p>
                       </div>
                     </div>
                     <Link to='/mypage' className='dropdown-item'>

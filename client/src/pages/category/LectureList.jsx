@@ -5,83 +5,44 @@ import Banner from '../../img/banner.png';
 import './style.scss';
 import { baseUrl } from '../../config/baseUrl';
 
-const StarRatings = ({ rating }) => {
-  const ratingToPercent = () => {
-    const score = +rating * 20;
-    return score + 1.5;
-  };
-
-  return (
-    <div className='star-ratings'>
-      <div
-        className='star-ratings-fill space-x-2 text-lg'
-        style={{ width: ratingToPercent() + '%' }}
-      >
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-      </div>
-      <div className='star-ratings-base space-x-2 text-lg'>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-      </div>
-    </div>
-  );
-};
-
 const LectureList = () => {
-  const [lectureListData, setLectureListData] = useState(null);
+  const [lectureListData, setLectureListData] = useState([]);
   const location = useLocation();
-  const categoryID = location.state?.categoryID;
-  const categoryName = location.state?.categoryName;
+  // 여기서 state 객체를 통해 전달된 값을 추출합니다.
+  const { SubcategoryID, SubcategoryName } = location.state || {};
 
   useEffect(() => {
-    const fetchData = async () => {
+    // 서버로부터 강의 목록을 가져오는 함수
+    const fetchLectures = async () => {
       try {
+        // 서브카테고리 ID를 사용하여 API 호출
         const response = await axios.get(
-          `${baseUrl}/api/categories/lectures/${categoryID}`,
-          {
-            withCredentials: true,
-          }
+          `${baseUrl}/api/categories/lectures/${SubcategoryID}`
         );
-        setLectureListData(response.data);
+        setLectureListData(response.data); // 결과를 상태에 저장
       } catch (error) {
         console.error('강의 리스트 가져오는 중 오류 발생:', error);
       }
     };
 
-    fetchData();
-  }, [categoryID]);
-  console.log('lectureListData:', lectureListData);
+    if (SubcategoryID) {
+      fetchLectures(); // 서브카테고리 ID가 있을 때만 함수 호출
+    }
+  }, [SubcategoryID]);
 
+  // 강의 목록 렌더링
   return (
-    <div className='search'>
-      <img className='banner-image' src={Banner} alt='banner' />
-      <h3 className='search-word'>선택한 카테고리: {categoryName}</h3>
-      <div className='card-container'>
-        {lectureListData && lectureListData.length > 0 ? (
-          lectureListData.map(course => (
-            <div className='card' key={course.LectureID}>
-              <img
-                className='card-image'
-                src={course.LectureImageURL}
-                alt='Course'
-              />
-              <div className='card-content'>
-                <h2 className='card-title'>{course.LectureTitle}</h2>
-                <p className='card-instructor'>{course.LectureInstructor}</p>
-                <p className='card-price'>{`₩${course.LecturePrice}`}</p>
-                <StarRatings rating={course.AverageRating} />
-              </div>
+    <div className='lecture-list'>
+      <h2>{SubcategoryName} 강의 목록</h2>
+      <div className='lectures'>
+        {lectureListData.length > 0 ? (
+          lectureListData.map(lecture => (
+            <div key={lecture.id} className='lecture'>
+              {/* 강의 정보 렌더링 */}
             </div>
           ))
         ) : (
-          <div></div>
+          <p>해당 카테고리의 강의가 없습니다.</p>
         )}
       </div>
     </div>

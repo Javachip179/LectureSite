@@ -50,9 +50,8 @@ const Home = () => {
       </div>
 
       <div className='card-container'>
-        <h5>따끈따끈, 신규 강의 🆕</h5>
+        <h3>따끈따끈, 신규 강의 🆕</h3>
         <p>새로운 흥미를 찾아 보세요</p>
-        <hr />
         <div className='new-courses'>
           <div className='card'>
             <img
@@ -184,9 +183,8 @@ const Home = () => {
           </div>
         </div>
 
-        <h5>유료강의보다 좋은 인기 강의 👍</h5>
+        <h3>유료강의보다 좋은 인기 강의 👍</h3>
         <p>무료 강의부터 가볍게 시작해 보세요.</p>
-        <hr />
         <div className='popular-courses'>
           <div className='card'>
             <img

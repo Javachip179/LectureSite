@@ -82,7 +82,7 @@ router.post('/signIn', async (req, res) => {
       }
 
       conn.query(
-        'SELECT u.UserID, u.UserEmail, u.UserName, u.ProfileImage, u.Password FROM Users u WHERE u.UserEmail = ?',
+        'SELECT u.UserID, u.UserEmail, u.UserName, u.UserNickname, u.ProfileImage, u.Password FROM Users u WHERE u.UserEmail = ?',
         [email],
         (err, result) => {
           // console.log(result);
@@ -113,6 +113,7 @@ router.post('/signIn', async (req, res) => {
               UserID: result[0].UserID,
               UserEmail: result[0].UserEmail,
               UserName: result[0].UserName,
+              UserNickname: result[0].UserNickname,
               ProfileImage: result[0].ProfileImage,
             };
             res.send({ success: true, userData });

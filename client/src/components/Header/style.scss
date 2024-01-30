@@ -74,42 +74,36 @@
   
     .drop-down {
       position: relative;
-      display: inline-block; // 드롭다운을 인라인 블록으로 설정
+      display: inline-block;
       font-size: 0.9rem;
-      appearance: none;
-  
+    
       &:hover {
         color: #4682B4;
-      }
-  
-      &:hover .dropdown-content {
-        display: block;
-        appearance: none;
+        
+        .dropdown-content {
+          display: block;
+        }
       }
     }
-  
+    
     .dropdown-toggle {
       padding: 10px 15px;
-      background-color: #fff;
       cursor: pointer;
       border: none;
-      position: relative; // 화살표 아이콘을 위한 상대적 위치 설정
-  
+      position: relative;
+    
       &:after {
-        // 드롭다운 화살표 아이콘 추가
         content: '';
         position: absolute;
         right: 10px;
         top: 50%;
-        transform: translateY(-50%);
+        transform: translateY(-50%) rotate(45deg);
         border-width: 0 2px 2px 0;
         padding: 3px;
-        pointer-events: none; // 아이콘이 클릭 이벤트를 받지 않도록 설정
-        transform: rotate(45deg); // 화살표 아이콘을 45도 회전
-        // 화살표 색상과 크기를 조정하려면 여기서 변경하세요.
+        pointer-events: none;
       }
     }
-  
+    
     .dropdown-content {
       display: none;
       position: absolute;
@@ -119,174 +113,181 @@
       border: 1px solid #ddd;
       z-index: 1000;
       min-width: 160px;
-      border-radius: 4px; // 드롭다운의 둥근 모서리
-      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1); // 드롭다운에 그림자 효과 추가
-  
-      &:before {
-        content: "";
-        position: absolute;
-        top: -11px; // 내부 삼각형의 상단 위치를 조정하세요
-        left: 19px; // 내부 삼각형의 좌측 위치를 조정하세요
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 11px solid #fff; // 내부 삼각형의 색은 드롭다운 배경색과 일치해야 합니다.
-        z-index: 2;
-      }
-    
+      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
+      
+      &:before,
       &:after {
         content: "";
         position: absolute;
-        top: -12px; // 테두리 삼각형의 상단 위치는 내부 삼각형보다 1px 더 위로
-        left: 18px; // 테두리 삼각형의 좌측 위치는 내부 삼각형보다 1px 더 좌측으로
-        border-left: 11px solid transparent;
-        border-right: 11px solid transparent;
-        border-bottom: 11px solid #ddd; // 테두리 삼각형의 색상을 원하는 테두리 색으로 설정
+        top: -11px;
+        left: 19px;
+        z-index: 2;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+      }
+      
+      &:before {
+        border-bottom: 11px solid #fff;
+      }
+      
+      &:after {
+        top: -12px;
+        border-bottom: 11px solid #ddd;
         z-index: 1;
       }
-  
-      a {
+    
+      .dropdown-title {
         padding: 12px 16px;
-        display: block;
+        color: #666;
+        text-align: left;
         text-decoration: none;
-        color: black;
-  
+        display: block;
+        position: relative;
+    
         &:hover {
-          background-color: #f7f7f7; // 호버 시 배경색 변경
+          background-color: #fff;
+          color: black;
+          
+          // Show the sub-dropdown content when hovering over the title
+          .sub-dropdown-content {
+            display: block;
+          }
+        }
+      }
+    
+      .sub-dropdown-content {
+        display: none; // Initially hide the sub-dropdown
+        position: absolute;
+        left: 100%; // Position to the right of the parent category
+        top: 0;
+        min-width: 160px;
+        background-color: #fff;
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        border: 1px solid #ddd;
+        margin-top: -1px;
+    
+        .sub-dropdown-title {
+          padding: 10px;
+          color: #666;
+    
+          &:hover {
+            background-color: #fff;
+            color: black;
+          }
         }
       }
     }
-  
-    // 드롭다운이 보이게 하는 토글 스타일
-    .drop-down:hover .dropdown-content {
-      display: block; // 마우스 오버 시 드롭다운 내용 표시
-    }
+    
   
     .links {
       display: flex;
       align-items: center;
       margin-left: auto;
-  
-      .in-link {
-        padding: 10px 15px;
-        text-decoration: none;
-        font-size: 0.9rem;
-        color: #333;
-        h6 {
-          margin: 0;
-          font-weight: normal;
-          font-size: 0.9rem;
+      gap: 10px; // 아이콘 간격을 조정합니다.
+    
+      // 장바구니 버튼 스타일
+      .cart-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        display: flex; // 중앙 정렬을 위해 flex 사용
+        align-items: center;
+        justify-content: center;
+        width: 24px; // 아이콘 크기 조절
+        height: 24px; // 아이콘 크기 조절
+    
+        svg {
+          fill: #333;
+          width: 100%; // svg 크기를 버튼 크기에 맞춤
+          height: auto;
         }
       }
-  
-      .up-link {
-        padding: 10px 15px;
-        text-decoration: none;
-        font-size: 0.9rem;
-        color: #4682B4;
-        h6 {
-          margin: 0;
-          font-weight: normal;
-          font-size: 0.9rem;
+    
+      // 프로필 버튼 및 드롭다운 스타일
+      .profile {
+        position: relative;
+        cursor: pointer;
+        width: 24px; // 아이콘 크기 조절
+        height: 24px; // 아이콘 크기 조절
+    
+        // 사용자 아이콘 스타일
+        .usericon {
+          border-radius: 50%;
+          width: 100%;
+          height: auto;
+        }
+    
+        // 드롭다운 스타일
+        .profile-dropdown {
+          display: none;
+          position: absolute;
+          top: 100%;
+          right: 0;
+          width: 200px;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          z-index: 10;
+          padding: 10px;
+          
+          // 드롭다운 내용 스타일
+          .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            
+            .user-profile-image {
+              border-radius: 50%;
+              width: 40px;
+              height: 40px;
+              margin-right: 10px;
+            }
+          }
+    
+          .dropdown-profile-info {
+            font-size: 0.8rem;
+          }
+    
+          .dropdown-item {
+            padding: 10px 0;
+            display: block;
+            color: #333;
+            
+            &:hover {
+              background-color: #f7f7f7;
+            }
+          }
+          
+          .dropdown-hr {
+            margin: 10px 0;
+            border: none;
+            height: 1px;
+            background-color: #ddd;
+          }
+        }
+    
+        // 프로필 아이콘 호버 시 드롭다운 표시
+        &:hover .profile-dropdown {
+          display: block;
         }
       }
-    }
-
-// 프로필 드롭다운 버튼 스타일
-.profile {
-  align-items: center;
-  margin-left: auto; // 드롭다운 내용을 위한 상대적 위치
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  .usericon {
-    border-radius: 50%; // 아이콘을 원형으로 만듬
-    width: 30px; // 아이콘 크기 설정
-    height: 30px; // 아이콘 크기 설정
-  }
-
-  &:hover {
-    .profile-dropdown {
-      display: block; // 마우스 오버시 드롭다운 표시
-    }
-  }
-}
-
-// 프로필 드롭다운 내용 스타일
-.profile-dropdown {
-  display: none; // 기본적으로 숨김
-  position: absolute;
-  top: 100%; // 버튼 바로 아래에 위치
-  right: 0;
-  background-color: #fff; // 배경색
-  border: 1px solid #ccc; // 테두리
-  border-radius: 5px; // 둥근 테두리
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); // 그림자 효과
-  width: 200px; // 너비 설정
-  z-index: 100; // 다른 요소들 위에 표시
-
-  .user-info {
-    padding: 10px;
-    border-bottom: 1px solid #ccc; // 하단 테두리
-
-    .user-profile-image {
-      width: 50px; // 프로필 이미지 크기
-      height: 50px; // 프로필 이미지 크기
-      border-radius: 50%; // 이미지 원형으로 표시
-      margin-bottom: 10px; // 하단 여백
-    }
-
-    .dropdown-profile-info {
-      .dropdown-profile-nickname {
-        font-weight: bold; // 닉네임 볼드 처리
+    
+      // 로그인 상태일 때만 드롭다운과 장바구니 버튼을 표시
+      &.logged-in .cart-button,
+      &.logged-in .profile {
+        display: flex;
       }
-
-      .dropdown-profile-email {
-        font-size: 0.8rem; // 이메일 폰트 사이즈
-        color: #777; // 이메일 폰트 색상
+    
+      // 로그인 상태일 때 로그인 및 회원가입 버튼을 숨김
+      &.logged-in .in-link,
+      &.logged-in .up-link {
+        display: none;
       }
     }
-  }
-
-  .dropdown-item {
-    padding: 10px;
-    font-size: 0.9rem;
-    color: #333;
-    text-align: left; // 텍스트 왼쪽 정렬
-
-    &:hover {
-      background-color: #f7f7f7; // 호버시 배경색 변경
-    }
-  }
-
-  .dropdown-hr {
-    margin: 0; // 마진 제거
-  }
-}
-
-cart-button {
-  background: none;
-  border: 2px solid #333; // 테두리 색상과 두께를 원하는 대로 설정
-  border-radius: 50%; // 원형 테두리를 만들기 위해
-  cursor: pointer;
-  display: inline-flex; // SVG 아이콘을 가운데 정렬하기 위해
-  align-items: center; // 수직 가운데 정렬
-  justify-content: center; // 수평 가운데 정렬
-  padding: 5px; // 테두리와 아이콘 사이의 공간
-  margin-right: 20px; // 다른 요소와의 간격
-  transition: background-color 0.3s, transform 0.3s; // 배경색과 변형에 대한 부드러운 전환 효과
-
-  &:hover {
-    background-color: #f2f2f2; // 호버 시 배경색 변경
-    transform: scale(1.1); // 호버 시 아이콘 확대
-  }
-
-  svg {
-    fill: #333; // 아이콘 색상 설정
-    width: 20px; // 아이콘 크기 설정
-    height: 20px; // 아이콘 크기 설정
-  }
-}
     
   }
 }
