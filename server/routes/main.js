@@ -3,11 +3,10 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 router.use(bodyParser.json());
 const mysql = require('../database/mysql');
+const jwt = require('jsonwebtoken');
 
-//메인페이지에서 인기강의, 신규강의, 유저정보 가져옴
+// 메인페이지에서 인기강의, 신규강의, 유저정보 가져옴
 router.get('/', (req, res) => {
-  const userId = req.headers['userid'];
-
   // MySQL 연결
   mysql.getConnection((error, conn) => {
     if (error) {
@@ -20,25 +19,25 @@ router.get('/', (req, res) => {
     }
 
     // SQL 쿼리 실행
-    const hotLectureQuery = `
-      SELECT
-        l.LectureID,
-        l.LectureImageURL,
-        l.Title,
-        i.InstructorName,
-        l.LecturePrice,
-        AVG(c.Rating) AS AverageRating
-      FROM
-        Lectures l
-      JOIN
-        Instructor i ON l.InstructorID = i.InstructorID
-      JOIN 
-        Comments c ON l.LectureID = c.LectureID 
-      GROUP BY
-        l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
-      ORDER BY
-        AverageRating DESC
-      LIMIT 5;
+    const popularLectureQuery = `
+    SELECT
+  l.LectureID,
+  l.LectureImageURL,
+  l.Title,
+  i.InstructorName,
+  CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
+  COALESCE(AVG(c.Rating), 0) AS AverageRating
+FROM
+  Lectures l
+JOIN
+  Instructor i ON l.InstructorID = i.InstructorID
+LEFT JOIN 
+  Comments c ON l.LectureID = c.LectureID
+GROUP BY
+  l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.IsFree
+ORDER BY
+  AverageRating DESC
+LIMIT 6;
     `;
 
     const newLectureQuery = `
@@ -48,7 +47,7 @@ router.get('/', (req, res) => {
         l.Title,
         i.InstructorName,
         l.LecturePrice,
-        AVG(c.Rating) AS AverageRating,
+        COALESCE(AVG(c.Rating), 0) AS AverageRating,
         l.UploadDate
       FROM
         Lectures l
@@ -59,28 +58,17 @@ router.get('/', (req, res) => {
       GROUP BY
         l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.UploadDate
       ORDER BY l.UploadDate DESC
-      LIMIT 5;
-    `;
-
-    const userInfoQuery = `
-      SELECT
-        u.UserID,
-        u.UserEmail,
-        u.UserNickname,
-        u.ProfileImage
-      FROM 
-        Users u
-      WHERE 
-        u.UserID = '${userId}';
+      LIMIT 6;
     `;
 
     // 병렬로 두 개의 쿼리 실행
-    conn.query(hotLectureQuery, (error, hotLecture) => {
+    conn.query(popularLectureQuery, (error, popularLecture) => {
       if (error) {
         console.error(error);
         res.status(500).json({
           status: 'error',
-          message: 'Error fetching hot lectures',
+          message: 'Error fetching popular lectures',
+          error: error.message,
         });
         return;
       }
@@ -91,33 +79,22 @@ router.get('/', (req, res) => {
           res.status(500).json({
             status: 'error',
             message: 'Error fetching new lectures',
+            error: error.message,
           });
           return;
         }
-        conn.query(userInfoQuery, (error, userInfo) => {
-          if (error) {
-            console.error(error);
-            res.status(500).json({
-              status: 'error',
-              message: 'Error fetching user info',
-            });
-            return;
-          }
 
-          const combinedResults = {
-            hotLecture: hotLecture,
+        // 두 쿼리에 대한 응답을 모두 클라이언트에게 보냄
+        res.status(200).json({
+          status: 'success',
+          data: {
+            popularLecture: popularLecture,
             newLecture: newLecture,
-            userInfo: userInfo,
-          };
-
-          res.status(200).json({
-            status: 'success',
-            data: combinedResults,
-          });
-
-          // MySQL 연결 종료
-          conn.release();
+          },
         });
+
+        // MySQL 연결 종료
+        conn.release();
       });
     });
   });

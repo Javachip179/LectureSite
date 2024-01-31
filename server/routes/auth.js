@@ -127,8 +127,12 @@ router.post('/signIn', async (req, res) => {
       );
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).send('내부 서버 오류');
+    if (error.name === 'TokenExpiredError') {
+      res.status(401).send('토큰이 만료되었습니다.'); // JWT 토큰 만료 오류
+    } else {
+      console.log(error);
+      res.status(500).send('내부 서버 오류');
+    }
   }
 });
 

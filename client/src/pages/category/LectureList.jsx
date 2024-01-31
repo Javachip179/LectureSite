@@ -38,7 +38,7 @@ const LectureList = () => {
   const [lectureListData, setLectureListData] = useState([]);
   const location = useLocation();
   // 여기서 state 객체를 통해 전달된 값을 추출합니다.
-  const { SubcategoryID, SubcategoryName } = location.state || {};
+  const { SubcategoryID, SubcategoryName, CategoryName } = location.state || {};
 
   useEffect(() => {
     // 서버로부터 강의 목록을 가져오는 함수
@@ -63,7 +63,10 @@ const LectureList = () => {
   return (
     <div className='lecture-list'>
       <img className='banner-image' src={Banner} alt='banner' />
-      <h1>선택한 카테고리: {SubcategoryName} </h1>
+
+      <h1>
+        {CategoryName} / {SubcategoryName}
+      </h1>
       <div className='lectures-container'>
         {lectureListData && lectureListData.length > 0 ? (
           lectureListData.map(course => (

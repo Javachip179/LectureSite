@@ -38,10 +38,13 @@ const SearchPage = () => {
   const location = useLocation();
   const searchWord = location.state?.searchWord;
   const [searchData, setSearchData] = useState(null);
+  const navigate = useNavigate();
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log('검색 요청을 보내는 중:', searchWord);
         const response = await axios.get(
           `${baseUrl}/api/search-list/${searchWord}`,
           {
@@ -62,12 +65,36 @@ const SearchPage = () => {
     fetchData();
   }, [searchWord]);
 
-  console.log('searchData:', searchData);
+  const onSubCategoryClick = (SubcategoryID, SubcategoryName, CategoryName) => {
+    navigate('/lectureList', {
+      state: {
+        SubcategoryID,
+        SubcategoryName,
+        CategoryName,
+      },
+    });
+  };
 
   return (
     <div className='search'>
       <img className='banner-image' src={Banner} alt='banner' />
-      <h3 className='search-word'>전체 강의</h3>
+      <div className='subcategories-container'>
+        {subCategories.map(subCategory => (
+          <button
+            key={subCategory.SubcategoryID}
+            onClick={() =>
+              onSubCategoryClick(
+                subCategory.SubcategoryID,
+                subCategory.SubcategoryName,
+                subCategory.CategoryName
+              )
+            }
+          >
+            {subCategory.SubcategoryName}
+          </button>
+        ))}
+      </div>
+      <h1>전체 강의</h1>
       <div className='card-container'>
         {searchData && searchData.length > 0 ? (
           searchData.map(course => (

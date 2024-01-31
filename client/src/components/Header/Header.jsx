@@ -96,9 +96,17 @@ const Header = () => {
     }
   };
 
-  const onSubCategoryHandler = async (SubcategoryID, SubcategoryName) => {
+  const onSubCategoryHandler = async (
+    SubcategoryID,
+    SubcategoryName,
+    CategoryName
+  ) => {
     navigate('/lectureList', {
-      state: { SubcategoryID: SubcategoryID, SubcategoryName: SubcategoryName },
+      state: {
+        SubcategoryID: SubcategoryID,
+        SubcategoryName: SubcategoryName,
+        CategoryName: CategoryName,
+      },
     });
   };
 
@@ -157,7 +165,8 @@ const Header = () => {
                           onClick={() =>
                             onSubCategoryHandler(
                               subCategory.SubcategoryID,
-                              subCategory.SubcategoryName
+                              subCategory.SubcategoryName,
+                              category.CategoryName
                             )
                           }
                         >
