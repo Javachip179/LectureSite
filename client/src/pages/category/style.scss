@@ -1,10 +1,8 @@
-$lightGreen : #b9e7e7;
-$default-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+@import '../../style/variables';
+@import '../../style/base';
 
-
-
-    .search {
-      .card-container {
+    .lecture-list {
+      .lectures-container {
         display: grid;
         grid-template-columns: repeat(4, minmax(200px, 1fr));
         gap: 20px;

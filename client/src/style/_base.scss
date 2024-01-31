@@ -1,0 +1,8 @@
+@use 'variables';
+
+h1 {
+  font-weight: variables.$font-weight1;
+  font-size: variables.$font-size1;
+  color: variables.$color4;
+  line-height: variables.$line-height1;
+}

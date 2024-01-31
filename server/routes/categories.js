@@ -73,6 +73,7 @@ router.get('/sub', (req, res) => {
 //세부 카테고리 클릭시 해당 카테고리의 강의들을 평점순으로 출력
 router.get('/lectures/:SubcategoryID', (req, res) => {
   const SubcategoryID = req.params.SubcategoryID;
+  console.log(SubcategoryID);
 
   // MySQL 연결
   mysql.getConnection((error, conn) => {
@@ -85,25 +86,28 @@ router.get('/lectures/:SubcategoryID', (req, res) => {
     // SQL 쿼리 실행
     const query = `
     SELECT 
-      l.LectureID,
-      l.LectureImageURL,
-      l.Title,
-      AVG(c.Rating) AS AverageRating,
-      l.LecturePrice 
-    FROM 
-      Lectures l
-    JOIN
-      LectureSubcategory ls ON l.LectureID = ls.LectureID
-    JOIN 
-      Subcategory s ON s.SubcategoryID = ls.SubcategoryID
-    LEFT JOIN 
-      Comments c ON c.LectureID = l.LectureID
-    WHERE 
-      s.SubcategoryID = ?
-    GROUP BY 
-      l.LectureID
-    ORDER BY 
-      AverageRating DESC;
+    l.LectureID,
+    l.LectureImageURL,
+    l.Title,
+    i.InstructorName,
+    AVG(c2.Rating) AS AverageRating,
+    l.LecturePrice 
+FROM 
+    Lectures l
+JOIN
+    LectureCategory lc ON l.LectureID = lc.LectureID
+JOIN 
+    Subcategory s ON s.SubcategoryID  = lc.SubcategoryID
+JOIN 
+    Comments c2 ON c2.LectureID = l.LectureID
+JOIN
+    Instructor i ON l.InstructorID = i.InstructorID
+WHERE 
+    lc.SubcategoryID = ?
+GROUP BY 
+    l.LectureID
+ORDER BY 
+    AverageRating DESC;
     `;
 
     conn.query(query, [SubcategoryID], (error, results) => {

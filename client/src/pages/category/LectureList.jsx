@@ -5,6 +5,35 @@ import Banner from '../../img/banner.png';
 import './style.scss';
 import { baseUrl } from '../../config/baseUrl';
 
+const StarRatings = ({ rating }) => {
+  const ratingToPercent = () => {
+    const score = +rating * 20;
+    return score + 1.5;
+  };
+
+  return (
+    <div className='star-ratings'>
+      <div
+        className='star-ratings-fill space-x-2 text-lg'
+        style={{ width: ratingToPercent() + '%' }}
+      >
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+      </div>
+      <div className='star-ratings-base space-x-2 text-lg'>
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+        <span>★</span>
+      </div>
+    </div>
+  );
+};
+
 const LectureList = () => {
   const [lectureListData, setLectureListData] = useState([]);
   const location = useLocation();
@@ -33,16 +62,27 @@ const LectureList = () => {
   // 강의 목록 렌더링
   return (
     <div className='lecture-list'>
-      <h2>{SubcategoryName} 강의 목록</h2>
-      <div className='lectures'>
-        {lectureListData.length > 0 ? (
-          lectureListData.map(lecture => (
-            <div key={lecture.id} className='lecture'>
-              {/* 강의 정보 렌더링 */}
+      <img className='banner-image' src={Banner} alt='banner' />
+      <h1>선택한 카테고리: {SubcategoryName} </h1>
+      <div className='lectures-container'>
+        {lectureListData && lectureListData.length > 0 ? (
+          lectureListData.map(course => (
+            <div className='card' key={course.LectureID}>
+              <img
+                className='card-image'
+                src={course.LectureImageURL}
+                alt='Course'
+              />
+              <div className='card-content'>
+                <h2 className='card-title'>{course.Title}</h2>
+                <p className='card-instructor'>{course.InstructorName}</p>
+                <p className='card-price'>{`₩${course.LecturePrice}`}</p>
+                <StarRatings rating={course.AverageRating} />
+              </div>
             </div>
           ))
         ) : (
-          <p>해당 카테고리의 강의가 없습니다.</p>
+          <div>해당 카테고리에 대한 강의가 없습니다.</div>
         )}
       </div>
     </div>

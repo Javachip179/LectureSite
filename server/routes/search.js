@@ -19,26 +19,33 @@ router.get('/:searchWord', (req, res) => {
 
     // SQL 쿼리 실행
     const query = `
-        SELECT
-          l.LectureID,
-          l.LectureImageURL,
-          l.Title,
-          l.LecturePrice,
-          AVG(c.Rating) AS AverageRating
-        FROM
-          Lectures l
-        JOIN
-          LectureCategory lc ON l.LectureID = lc.LectureID
-        JOIN 
-          Comments c ON l.LectureID = c.LectureID 
-        JOIN 
-          Category c2 ON c2.CategoryID = lc.CategoryID 
-        WHERE 
-          l.Title LIKE '%${searchWord}%' OR c2.CategoryName LIKE '%${searchWord}%'
-        GROUP BY
-          l.LectureID, l.LectureImageURL, l.Title, l.LecturePrice
-        ORDER BY
-          AverageRating DESC;
+    SELECT
+    l.LectureID,
+    l.LectureImageURL,
+    l.Title,
+    l.LecturePrice,
+    i.InstructorName,
+    AVG(c.Rating) AS AverageRating
+FROM
+    Lectures l
+JOIN
+    LectureCategory lc ON l.LectureID = lc.LectureID
+JOIN
+    Comments c ON l.LectureID = c.LectureID
+JOIN
+    Category c2 ON c2.CategoryID = lc.CategoryID
+JOIN
+    Subcategory s ON s.CategoryID = c2.CategoryID
+JOIN
+    Instructor i ON l.InstructorID = i.InstructorID
+WHERE
+    l.Title LIKE '%${searchWord}%' OR 
+    c2.CategoryName LIKE '%${searchWord}%' OR 
+    s.SubcategoryName LIKE '%${searchWord}%'
+GROUP BY
+    l.LectureID, l.LectureImageURL, l.Title, l.LecturePrice, i.InstructorName
+ORDER BY
+    AverageRating DESC;
       `;
 
     conn.query(query, (error, results) => {

@@ -89,14 +89,16 @@ const Header = () => {
     setSearchWord(newSearchWord);
   };
 
-  const onSearchHandler = async e => {
-    e.preventDefault();
-    navigate('/search', { state: { searchWord: searchWord } });
+  const onSearchSubmit = e => {
+    e.preventDefault(); // 폼 기본 제출 동작 방지
+    if (searchWord) {
+      navigate('/search', { state: { searchWord: searchWord } });
+    }
   };
 
   const onSubCategoryHandler = async (SubcategoryID, SubcategoryName) => {
     navigate('/lectureList', {
-      state: { SubcategoryID: SubcategoryID, categoryName: SubcategoryName },
+      state: { SubcategoryID: SubcategoryID, SubcategoryName: SubcategoryName },
     });
   };
 
@@ -170,15 +172,17 @@ const Header = () => {
         </div>
 
         <div className='search-bar'>
-          <input
-            type='text'
-            placeholder=' '
-            value={searchWord || ''}
-            onChange={onInputChange}
-          />
-          <button onClick={onSearchHandler}>
-            <Search />
-          </button>
+          <form onSubmit={onSearchSubmit}>
+            <input
+              type='text'
+              placeholder=' '
+              value={searchWord || ''}
+              onChange={onInputChange}
+            />
+            <button type='submit' disabled={!searchWord}>
+              <Search />
+            </button>
+          </form>
         </div>
 
         <div className='links'>

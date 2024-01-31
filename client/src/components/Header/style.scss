@@ -184,110 +184,130 @@
       display: flex;
       align-items: center;
       margin-left: auto;
-      gap: 10px; // 아이콘 간격을 조정합니다.
+      position: relative; // 상대적 위치 지정
+      
+      // 로그인 전의 링크에 고정된 너비를 설정합니다.
+      .in-link,
+      .up-link {
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        color: #333;
+        flex: 1; // 요소들이 공간을 균등하게 차지하도록 설정
+        text-align: center; // 텍스트 가운데 정렬
+        min-width: 0px; // 최소 너비 설정
     
-      // 장바구니 버튼 스타일
-      .cart-button {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        margin: 0;
-        display: flex; // 중앙 정렬을 위해 flex 사용
-        align-items: center;
-        justify-content: center;
-        width: 24px; // 아이콘 크기 조절
-        height: 24px; // 아이콘 크기 조절
-    
-        svg {
-          fill: #333;
-          width: 100%; // svg 크기를 버튼 크기에 맞춤
-          height: auto;
+        h6 {
+          margin: 0;
+          font-weight: normal;
+          font-size: 0.9rem;
         }
       }
-    
-      // 프로필 버튼 및 드롭다운 스타일
-      .profile {
-        position: relative;
-        cursor: pointer;
-        width: 24px; // 아이콘 크기 조절
-        height: 24px; // 아이콘 크기 조절
-    
-        // 사용자 아이콘 스타일
-        .usericon {
-          border-radius: 50%;
-          width: 100%;
-          height: auto;
-        }
-    
-        // 드롭다운 스타일
-        .profile-dropdown {
-          display: none;
-          position: absolute;
-          top: 100%;
-          right: 0;
-          width: 200px;
-          background-color: #fff;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-          z-index: 10;
-          padding: 10px;
-          
-          // 드롭다운 내용 스타일
-          .user-info {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            
-            .user-profile-image {
-              border-radius: 50%;
-              width: 40px;
-              height: 40px;
-              margin-right: 10px;
-            }
-          }
-    
-          .dropdown-profile-info {
-            font-size: 0.8rem;
-          }
-    
-          .dropdown-item {
-            padding: 10px 0;
-            display: block;
-            color: #333;
-            
-            &:hover {
-              background-color: #f7f7f7;
-            }
-          }
-          
-          .dropdown-hr {
-            margin: 10px 0;
-            border: none;
-            height: 1px;
-            background-color: #ddd;
-          }
-        }
-    
-        // 프로필 아이콘 호버 시 드롭다운 표시
-        &:hover .profile-dropdown {
-          display: block;
-        }
-      }
-    
-      // 로그인 상태일 때만 드롭다운과 장바구니 버튼을 표시
-      &.logged-in .cart-button,
-      &.logged-in .profile {
-        display: flex;
-      }
-    
-      // 로그인 상태일 때 로그인 및 회원가입 버튼을 숨김
-      &.logged-in .in-link,
-      &.logged-in .up-link {
-        display: none;
-      }
+
+// 프로필 드롭다운 버튼 스타일
+.profile {
+  align-items: center;
+  margin-left: auto; // 드롭다운 내용을 위한 상대적 위치
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  .usericon {
+    border-radius: 50%; // 아이콘을 원형으로 만듬
+    width: 30px; // 아이콘 크기 설정
+    height: 30px; // 아이콘 크기 설정
+  }
+
+  &:hover {
+    .profile-dropdown {
+      display: block; // 마우스 오버시 드롭다운 표시
     }
-    
+  }
+}
+
+.profile-dropdown {
+  display: none; // 기본적으로 숨김
+  position: absolute;
+  top: 100%; // 버튼 바로 아래에 위치
+  right: 0;
+  background-color: #fff; // 배경색
+  border: 1px solid #ccc; // 테두리
+  border-radius: 5px; // 둥근 테두리
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); // 그림자 효과
+  width: 200px; // 너비 설정
+  z-index: 100; // 다른 요소들 위에 표시
+  padding: 10px; // 내부 여백 추가
+  box-sizing: border-box; // 패딩을 너비에 포함
+
+  .user-info {
+    display: flex; // 내부 아이템을 가로로 정렬
+    align-items: center; // 아이템을 세로 중앙에 정렬
+    margin-bottom: 10px; // 아래쪽 항목과의 간격 조정
+
+    .user-profile-image {
+      width: 50px; // 프로필 이미지 크기
+      height: 50px; // 프로필 이미지 크기
+      border-radius: 50%; // 이미지 원형으로 표시
+      margin-right: 10px; // 이미지와 정보 사이 간격 조정
+    }
+
+    .dropdown-profile-nickname, 
+    .dropdown-profile-email {
+      margin: 0; // 기본 마진 제거
+    }
+
+    .dropdown-profile-nickname {
+      font-weight: bold; // 닉네임 볼드 처리
+    }
+
+    .dropdown-profile-email {
+      font-size: 0.8rem; // 이메일 폰트 사이즈
+      color: #777; // 이메일 폰트 색상
+    }
+  }
+
+  .dropdown-item {
+    font-size: 0.9rem;
+    color: #333;
+    text-align: left; // 텍스트 왼쪽 정렬
+    padding: 10px 0; // 상하 여백 설정, 좌우 여백 제거
+
+    &:hover {
+      background-color: #f7f7f7; // 호버시 배경색 변경
+    }
+  }
+
+  .dropdown-hr {
+    border: none; // 기본 테두리 제거
+    height: 1px; // 선의 높이 설정
+    background-color: #ccc; // 선의 색상 설정
+    margin: 10px 0; // 상하 여백 설정, 좌우 여백 제거
+  }
+}
+
+.cart-button {
+  background: none;
+  border: 2px solid #333; // 테두리 색상과 두께를 원하는 대로 설정
+  border-radius: 50%; // 원형 테두리를 만들기 위해
+  cursor: pointer;
+  display: inline-flex; // SVG 아이콘을 가운데 정렬하기 위해
+  align-items: center; // 수직 가운데 정렬
+  justify-content: center; // 수평 가운데 정렬
+  padding: 5px; // 테두리와 아이콘 사이의 공간
+  margin-right: 20px; // 다른 요소와의 간격
+  transition: background-color 0.3s, transform 0.3s; // 배경색과 변형에 대한 부드러운 전환 효과
+
+  &:hover {
+    background-color: #f2f2f2; // 호버 시 배경색 변경
+  }
+
+  svg {
+    fill: #333; // 아이콘 색상 설정
+    width: 20px; // 아이콘 크기 설정
+    height: 20px; // 아이콘 크기 설정
+    }
+  } 
+}
+
   }
 }
