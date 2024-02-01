@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import './style.scss';
-import { NavLink } from 'react-router-dom';
-import { FaChevronRight } from 'react-icons/fa';
-import { FaThumbsUp } from 'react-icons/fa';
-import { FaCheck } from 'react-icons/fa';
-import LecturesTOC from './lecturesTOC/LecturesTOC';
-import Comment from './comment/Comment.jsx';
+import axios from 'axios';
+import { baseUrl } from '../../config/baseUrl.js';
+import jsCookie from 'js-cookie';
+import { AuthContext } from '../../context/authContext.js';
+import DefaultImage from '../../img/defaultProfileImage.png';
 
 const StarRatings = ({ rating }) => {
   const ratingToPercent = () => {
@@ -37,197 +37,446 @@ const StarRatings = ({ rating }) => {
 };
 
 const LectureInfo = () => {
-  const [activeNav, setActiveNav] = React.useState('lecturesInfo'); // 활성 네비게이션 상태
+  const [lectureData, setLectureData] = useState({});
+  const [tocData, setTocData] = useState([]);
+  const [categoryData, setCategoryData] = useState({});
+  const [commentData, setCommentData] = useState({});
+  const [questionData, setQuestionData] = useState({});
+  const [menuStates, setMenuStates] = useState({});
+  const { lectureID } = useParams();
+  const { currentUser } = useContext(AuthContext);
+  const [isInCart, setIsInCart] = useState(false);
+  const [isEnrollment, setIsEnrollment] = useState(false);
 
-  const CommentData = {
-    ratingsCount: 2267,
-  };
-
-  const [isSticky, setIsSticky] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      // 스크롤 위치가 443px를 초과했을 때만 isSticky를 true로 설정합니다.
-      const shouldStick = window.scrollY > 350;
-      setIsSticky(shouldStick);
+    const topLevelMenus = tocData.filter(menu => menu.ParentTOCID === null);
+
+    // 동적으로 상태 생성
+    const initialState = {};
+    topLevelMenus.forEach((menu, index) => {
+      initialState[`menu${index + 1}Open`] = index === 0;
+    });
+
+    setMenuStates(initialState);
+  }, [tocData]);
+
+  useEffect(() => {
+    const token = jsCookie.get('userToken');
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/api/lecture/${lectureID}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        setLectureData(response.data.lecture);
+        setTocData(response.data.toc);
+        setCategoryData(response.data.categories);
+        setCommentData(response.data.comments);
+        setQuestionData(response.data.question);
+        console.log('questions Data:', response.data.question);
+      } catch (error) {
+        console.error('강의 정보를 불러오는 중 오류 발생:', error);
+      }
     };
 
-    // 스크롤 이벤트 리스너 등록
-    window.addEventListener('scroll', handleScroll);
+    fetchData();
 
-    // 컴포넌트가 언마운트될 때 리스너를 정리합니다.
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
+    const fetchCart = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/api/cart/cartlist/check`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            lectureId: lectureID,
+          },
+        });
+
+        // console.log("cart API 응답:", response);
+
+        if (response.data) {
+          setIsInCart(true);
+        } else {
+          setIsInCart(false);
+        }
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+      }
     };
+
+    fetchCart();
+
+    const fetchEnrollment = async () => {
+      try {
+        const response = await axios.get(
+          `${baseUrl}/api/enrollment/checked/${lectureID}`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // console.log("enroll API 응답:", response);
+
+        setIsEnrollment(response.data);
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+      }
+    };
+
+    fetchEnrollment();
   }, []);
 
+  // console.log("isInCart:", isInCart);
+  // console.log("isEnrollment", isEnrollment);
+
+  const createToggleFunction = menuIndex => {
+    return () => {
+      setMenuStates(prevStates => {
+        const updatedStates = { ...prevStates };
+        updatedStates[`menu${menuIndex + 1}Open`] =
+          !prevStates[`menu${menuIndex + 1}Open`];
+        return updatedStates;
+      });
+    };
+  };
+
+  const handleScrollToSection = sectionId => {
+    const sectionElement = document.getElementById(sectionId);
+    if (sectionElement) {
+      sectionElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const calculateAverageRating = () => {
+    if (
+      !commentData ||
+      !Array.isArray(commentData) ||
+      commentData.length === 0
+    ) {
+      return 0;
+    }
+
+    const totalRating = commentData.reduce((sum, comment) => {
+      return sum + comment.Rating;
+    }, 0);
+
+    const averageRating = totalRating / commentData.length;
+    return averageRating;
+  };
+
+  const averageRating = calculateAverageRating();
+
+  const watchLectureHandler = lectureID => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+    } else {
+      navigate(`/watchlecture/${lectureID}`);
+    }
+  };
+
+  const LectureEnrollHandler = async () => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+    } else {
+      try {
+        const token = jsCookie.get('userToken');
+        await axios.post(
+          `${baseUrl}/api/enrollment`,
+          { lectureId: lectureID }, // 수정된 부분
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // 결제하기
+
+        setIsEnrollment(true);
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+      }
+    }
+  };
+
+  const addToCartHandler = async () => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+    } else {
+      try {
+        const token = jsCookie.get('userToken');
+
+        // 이미 장바구니에 담겨있는지 확인
+        if (isInCart) {
+          alert('이미 장바구니에 담겨있습니다.');
+        } else if (isEnrollment) {
+          alert('이미 수강한 강의입니다.');
+        } else {
+          // 장바구니에 담기
+          await axios.post(
+            `${baseUrl}/api/cart/add-lecture`,
+            {
+              LectureID: lectureID,
+            },
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          setIsInCart(true);
+          alert('장바구니에 강의를 추가했습니다.');
+        }
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+      }
+    }
+  };
+
   return (
-    <div className='lecture-info'>
-      <div className='lecture-header'>
-        <div className='lecture-course'>
-          <div className='lecture-image'>
+    <div className='lecture'>
+      <div className='lecture-container'>
+        <div className='lecture-information'>
+          {lectureData && lectureData.length > 0 && (
             <img
-              src='https://cdn.inflearn.com/public/courses/331985/cover/f0501069-2139-4112-aafa-a9b3a2932860/331985-eng.png'
-              alt='Course'
+              className='lecture-image'
+              src={lectureData[0].LectureImageURL || DefaultImage}
+              alt='lecture'
             />
-          </div>
-          <div className='lecture-title'>
-            <p className='lecture-category'>
-              백엔드 <FaChevronRight /> Node.js
-            </p>
-            <h3>
-              [코드팩토리] [초급] NestJS REST API 백엔드 완전 정복 마스터 클래스
-              - Part 1 NestJS Core
-            </h3>
-            <p className='lecture-instructor'>코드팩토리</p>
-            <StarRatings rating={5.0} />
-            <span>{CommentData.ratingsCount.toLocaleString()}개의 수강평</span>
-            <div className='lecture-tag'>
-              <span>#React</span>
-              <span>#Node.js</span>
-              <span>#원데이</span>
-              <span>#MongoDB</span>
-              <span>#Express</span>
+          )}
+
+          <div className='lecture-information-details'>
+            <div className='lecture-information-details'>
+              <div className='lecture-category'>
+                {categoryData &&
+                  Object.keys(categoryData).map(key => (
+                    <div key={key}>
+                      <span>{categoryData[key].CategoryName}</span>
+                      {categoryData[key].SubcategoryName && (
+                        <span>·{categoryData[key].SubcategoryName}</span>
+                      )}
+                    </div>
+                  ))}
+              </div>
+
+              <div className='lecture-title'>
+                {lectureData.length > 0
+                  ? lectureData[0].LectureTitle
+                  : '강의 제목 없음'}
+              </div>
+            </div>
+
+            <div className='lecture-rating-details'>
+              <div className='lecture-rating'>
+                <StarRatings rating={averageRating} />
+              </div>
+              <div className='lecture-rating-count'>
+                {commentData.length > 0
+                  ? `(${calculateAverageRating().toFixed(1)}점)`
+                  : '(평점 정보 없음)'}
+              </div>
+            </div>
+            <div className='lecture-instructor'>
+              {lectureData && lectureData[0] && lectureData[0].InstructorName}
+            </div>
+            <div className='lecture-price'>
+              {lectureData &&
+                lectureData[0] &&
+                lectureData[0].PriceDisplay.toLocaleString()}
+            </div>
+
+            <div className='lecture-time'>
+              {lectureData &&
+                lectureData[0] &&
+                lectureData[0].FormattedLectureTime}
+            </div>
+
+            <div className='lecture-button'>
+              {isEnrollment ? (
+                <button
+                  onClick={() => watchLectureHandler(lectureID)}
+                  className='lecture-paid'
+                >
+                  이어서 학습하기
+                </button>
+              ) : (
+                <button
+                  onClick={() => LectureEnrollHandler()}
+                  className='lecture-paid'
+                >
+                  수강하기
+                </button>
+              )}
+              {isInCart ||
+                (!isEnrollment && (
+                  <button
+                    className='lecture-add-cart'
+                    onClick={() => addToCartHandler()}
+                  >
+                    장바구니 담기
+                  </button>
+                ))}
             </div>
           </div>
         </div>
       </div>
 
-      <div className={`lecture-nav-menu ${isSticky ? 'sticky' : ''}`}>
-        <div className='lecture-nav-container'>
-          <a
-            href='#lecturesInfo'
-            className={`lecture-nav-list ${
-              activeNav === 'lecturesInfo' ? 'active' : ''
-            }`}
-            onClick={() => setActiveNav('lecturesInfo')}
+      <div className='lecture-card'>
+        <div className='lecture-card-button'>
+          <button
+            onClick={() => handleScrollToSection('introduction')}
+            className='lecture-card-introduction'
           >
             강의소개
-          </a>
-          <a
-            href='#lecturesTOC'
-            className={`lecture-nav-list ${
-              activeNav === 'lecturesTOC' ? 'active' : ''
-            }`}
-            onClick={() => setActiveNav('lecturesTOC')}
+          </button>
+          <button
+            onClick={() => handleScrollToSection('instructor')}
+            className='lecture-card-instructor'
+          >
+            강사소개
+          </button>
+          <button
+            onClick={() => handleScrollToSection('curriculum')}
+            className='lecture-card-curriculum'
           >
             커리큘럼
-          </a>
-          <a
-            href='#comment'
-            className={`lecture-nav-list ${
-              activeNav === 'comment' ? 'active' : ''
-            }`}
-            onClick={() => setActiveNav('comment')}
+          </button>
+          <button
+            onClick={() => handleScrollToSection('comment')}
+            className='lecture-card-comment'
           >
             수강평
-          </a>
-          <a
-            href='#question'
-            className={`lecture-nav-list ${
-              activeNav === 'question' ? 'active' : ''
-            }`}
-            onClick={() => setActiveNav('question')}
-          >
-            Q&A
-          </a>
+          </button>
+          <button>Q&A</button>
         </div>
       </div>
+      <hr className='lecture-hr' />
 
-      <div className='lecture-content'>
-        <div className='lecture-left-wrapper'>
-          <div className='lecture-explanation'>
-            {/* 강의 설명 */}
-            <h2>초급자를 위한 준비물</h2>
-            <p>
-              Next.js는 프론트엔드부터 서버까지 만들 수 있는 React 기반
-              프레임워크입니다. 이제부터 사용하는 툴셋 개발에 가장합니다.
-            </p>
-            <div className='fixed-body'>
-              <div className='fixed-body-title'>
-                <p>
-                  <FaThumbsUp />
-                  <br />
-                  이런 걸<br />
-                  배워요 !
-                </p>
-              </div>
-              <div className='fixed-body-list'>
-                <p>
-                  <FaCheck className='checkmark-icon' /> Node.js
-                </p>
-                <p>
-                  <FaCheck className='checkmark-icon' />
-                  AWS
-                </p>
-                <p>
-                  <FaCheck className='checkmark-icon' /> Maria DB
-                </p>
-                <p>
-                  <FaCheck className='checkmark-icon' /> React
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* 강사소개 */}
-          <div className='lecture-instructor'>
-            <div className='lecture-instructor-header'>
-              <div class='instructor-intro'>
-                <div class='instructor-header'>
-                  안녕하세요
-                  <br />
-                  <span class='instructor-name'>강사이름</span>
-                  <span class='suffix-text'>입니다.</span>
-                </div>
-              </div>
-
-              <div className='instructor-image'>
-                <img
-                  src='https://cdn.inflearn.com/public/users/thumbnails/230375/184691e8-185e-477e-9daf-aa4edc5aac38'
-                  alt='Instructor'
-                />
-              </div>
-            </div>
-
-            <div className='lecture-instructor-content'>
-              <p className='instructor-title'>이메일</p>
-              <p className='instructor-info'>gher53@naver.com</p>
-              <p className='instructor-title'>프로젝트</p>
-              <p className='instructor-info'>
-                -온라인 교육 컨텐츠 운영
-                <br />
-                -오늘의 영화 추천 서비스
-                <br />
-                -카드 맞추기 게임
-              </p>
-              <p className='instructor-title'>강사소개</p>
-              <p className='instructor-info'>
-                한층 더 성장하고 싶으신가요?
-                <br />
-                기술들이 실무에서는 어떻게 쓰이는 지 궁금하신가요?
-                <br />
-                각각의 패키지와 라이브러리는 하나의 도구에 불과합니다.
-                <br />
-                시니어 개발자로 성장하기 위해선 '왜' 라는 질문이 정말 중요해요.
-              </p>
-            </div>
-          </div>
-          <div id='lecturesTOC'>
-            <LecturesTOC />
-          </div>
-          <div id='comment'>
-            <Comment />
+      <div className='lecture-details-container'>
+        <div className='lecture-details-introcuction' id='introduction'>
+          <h3 className='lecture-details-title'>강의소개</h3>
+          <div className='lecture-details-introcuction-content'>
+            {lectureData &&
+              lectureData[0] &&
+              lectureData[0].Description &&
+              lectureData[0].Description.split('.').map((sentence, index) => (
+                <div key={index}>{sentence.trim()}</div>
+              ))}
           </div>
         </div>
-
-        <div className='lecture-right-wrapper'>
-          <div className='card'>
-            <div className='card-header'>가격</div>
-            <div className='card-body'>
-              <button className='btn btn-primary'>수강 신청</button>
-              <button className='btn btn-secondary'>장바구니 추가</button>
+        <hr className='lecture-hr' />
+        <div className='lecture-details-instructor' id='instructor'>
+          <h3 className='lecture-details-title'>강사소개</h3>
+          <div className='lecture-details-instructor-content'>
+            <div>
+              {lectureData && lectureData[0] && lectureData[0].InstructorName}{' '}
+              강사님
             </div>
+            <div>
+              {lectureData && lectureData[0] && lectureData[0].InstructorEmail}
+            </div>
+            <div>
+              {lectureData &&
+                lectureData[0] &&
+                lectureData[0].InstructorDescription &&
+                lectureData[0].InstructorDescription.split('.').map(
+                  (sentence, index) => <div key={index}>{sentence.trim()}</div>
+                )}
+            </div>
+          </div>
+        </div>
+        <hr className='lecture-hr' />
+
+        <div className='curriculum-container'>
+          <h1 className='title' id='curriculum'>
+            커리큘럼
+          </h1>
+          <ul>
+            {Array.isArray(tocData) &&
+              tocData
+                .filter(menu => menu.ParentTOCID === null)
+                .map((menu, index) => (
+                  <li key={menu.TOCID} className='dropdown'>
+                    <input
+                      type='checkbox'
+                      checked={menuStates[`menu${index + 1}Open`]}
+                      onChange={createToggleFunction(index)}
+                    />
+                    <a
+                      href='#'
+                      data-toggle='dropdown'
+                      onClick={createToggleFunction(index)}
+                    >
+                      {menu.Title}
+                    </a>
+                    {menuStates[`menu${index + 1}Open`] && (
+                      <ul className='dropdown-menu'>
+                        {tocData
+                          .filter(subMenu => subMenu.ParentTOCID === menu.TOCID)
+                          .map((subMenu, subIndex) => (
+                            <li key={subIndex}>
+                              <a
+                                href='#'
+                                onClick={() => watchLectureHandler(lectureID)}
+                              >
+                                {subMenu.Title}
+                              </a>
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+          </ul>
+        </div>
+
+        <hr className='lecture-hr' />
+        <div className='lecture-details-comment' id='comment'>
+          <h3 className='lecture-details-title'>수강평</h3>
+          <div className='lecture-details-comment-content'>
+            {commentData && Array.isArray(commentData)
+              ? commentData.map(comment => (
+                  <div key={comment.CommentID} className='comment-userInfo'>
+                    <img
+                      className='comment-userImage'
+                      src={comment.ProfileImage || DefaultImage}
+                      alt=''
+                    />
+                    <div className='comment-userInfo-content'>
+                      <div className='comment-userNickname'>
+                        {comment.UserNickname}
+                      </div>
+                      <div className='comment-createDate'>
+                        {comment.WriteDate && (
+                          <>
+                            {
+                              new Date(comment.WriteDate)
+                                .toISOString()
+                                .split('T')[0]
+                            }
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className='comment-content'>{comment.Content}</div>
+                    <div className='comment-rating'>
+                      평점: {comment.Rating} 점
+                    </div>
+                  </div>
+                ))
+              : '수강평이 없습니다.'}
           </div>
         </div>
       </div>

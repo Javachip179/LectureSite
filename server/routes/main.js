@@ -18,8 +18,29 @@ router.get('/', (req, res) => {
       return;
     }
 
-    // SQL 쿼리 실행
     const popularLectureQuery = `
+    SELECT
+      l.LectureID,
+      l.LectureImageURL,
+      l.Title,
+      i.InstructorName,
+      CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
+      AVG(c.Rating) AS AverageRating
+    FROM
+      Lectures l
+    JOIN
+      Instructor i ON l.InstructorID = i.InstructorID
+    JOIN 
+      Comments c ON l.LectureID = c.LectureID 
+    GROUP BY
+      l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
+    ORDER BY
+      AverageRating DESC
+    LIMIT 6;
+  `;
+
+    // SQL 쿼리 실행
+    const freeLectureQuery = `
     SELECT
   l.LectureID,
   l.LectureImageURL,
@@ -47,7 +68,7 @@ LIMIT 6;
         l.Title,
         i.InstructorName,
         l.LecturePrice,
-        COALESCE(AVG(c.Rating), 0) AS AverageRating,
+        CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
         l.UploadDate
       FROM
         Lectures l
@@ -73,28 +94,41 @@ LIMIT 6;
         return;
       }
 
-      conn.query(newLectureQuery, (error, newLecture) => {
+      conn.query(freeLectureQuery, (error, freeLecture) => {
         if (error) {
           console.error(error);
           res.status(500).json({
             status: 'error',
-            message: 'Error fetching new lectures',
+            message: 'Error fetching free lectures',
             error: error.message,
           });
           return;
         }
 
-        // 두 쿼리에 대한 응답을 모두 클라이언트에게 보냄
-        res.status(200).json({
-          status: 'success',
-          data: {
-            popularLecture: popularLecture,
-            newLecture: newLecture,
-          },
-        });
+        conn.query(newLectureQuery, (error, newLecture) => {
+          if (error) {
+            console.error(error);
+            res.status(500).json({
+              status: 'error',
+              message: 'Error fetching new lectures',
+              error: error.message,
+            });
+            return;
+          }
 
-        // MySQL 연결 종료
-        conn.release();
+          // 두 쿼리에 대한 응답을 모두 클라이언트에게 보냄
+          res.status(200).json({
+            status: 'success',
+            data: {
+              popularLecture: popularLecture,
+              freeLecture: freeLecture,
+              newLecture: newLecture,
+            },
+          });
+
+          // MySQL 연결 종료
+          conn.release();
+        });
       });
     });
   });

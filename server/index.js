@@ -14,6 +14,8 @@ const userInfoRoutes = require('./routes/userInfo');
 const cartRoutes = require('./routes/cart');
 const paymentRoutes = require('./routes/payment');
 const lectureRoutes = require('./routes/lectures');
+const enrollmentRoutes = require('./routes/enrollment');
+const fileRoute = require('./img_server/fileUpload');
 
 // 미들웨어 등록
 const corsOptions = {
@@ -37,6 +39,8 @@ app.use('/api/userInfo', userInfoRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/modify', paymentRoutes);
 app.use('/api/lecture', lectureRoutes);
+app.use('/api/enrollment', enrollmentRoutes);
+app.use('/api/file', fileRoute);
 
 app.listen(3002, () => {
   console.log('Server is running on port 3002');

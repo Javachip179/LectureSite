@@ -18,10 +18,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import LectureList from './pages/category/LectureList';
 import LecturesInfo from './pages/lecturesinfo/LectureInfo';
-import LecturesTOC from './pages/lecturesinfo/lecturesTOC/LecturesTOC';
-import Comment from './pages/lecturesinfo/comment/Comment';
-import Question from './pages/lecturesinfo/question/Question';
-import WatchLecture from './pages/lecturesinfo/watchLecture/WatchLecture';
+import WatchLecture from './pages/watchLecture/WatchLecture';
 
 const Layout = () => {
   return (
@@ -73,18 +70,6 @@ const router = createBrowserRouter([
       {
         path: '/lecturesInfo/:lectureID',
         element: <LecturesInfo />,
-      },
-      {
-        path: '/lecturesTOC',
-        element: <LecturesTOC />,
-      },
-      {
-        path: '/comment',
-        element: <Comment />,
-      },
-      {
-        path: '/question',
-        element: <Question />,
       },
     ],
   },

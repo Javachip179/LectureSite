@@ -38,7 +38,7 @@ const SearchPage = () => {
   const location = useLocation();
   const searchWord = location.state?.searchWord;
   const [searchData, setSearchData] = useState(null);
-  const navigate = useNavigate();
+  const nav = useNavigate();
   const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
@@ -66,13 +66,17 @@ const SearchPage = () => {
   }, [searchWord]);
 
   const onSubCategoryClick = (SubcategoryID, SubcategoryName, CategoryName) => {
-    navigate('/lectureList', {
+    nav('/lectureList', {
       state: {
         SubcategoryID,
         SubcategoryName,
         CategoryName,
       },
     });
+  };
+
+  const handleSubmit = lectureID => {
+    nav(`/lecturesinfo/${lectureID}`);
   };
 
   return (
@@ -98,7 +102,11 @@ const SearchPage = () => {
       <div className='card-container'>
         {searchData && searchData.length > 0 ? (
           searchData.map(course => (
-            <div className='card' key={course.LectureID}>
+            <div
+              className='card'
+              key={course.LectureID}
+              onClick={() => handleSubmit(course.LectureID)}
+            >
               <img
                 className='card-image'
                 src={course.LectureImageURL}

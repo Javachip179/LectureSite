@@ -102,7 +102,7 @@ router.post('/signIn', async (req, res) => {
 
           if (bcrypt.compareSync(password, hashedPassword)) {
             const token = jwt.sign({ userID: result[0].UserID }, key, {
-              expiresIn: '1h',
+              expiresIn: '3h',
             });
 
             // 토큰을 쿠키에 저장

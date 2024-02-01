@@ -36,8 +36,9 @@ const StarRatings = ({ rating }) => {
 
 const Home = () => {
   const nav = useNavigate();
-  const [popularLecture, setPopularCourses] = useState([]);
+  const [freeLecture, setFreeCourses] = useState([]);
   const [newLecture, setNewCourses] = useState([]);
+  const [popularLecture, setPopularCourses] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +50,7 @@ const Home = () => {
 
           // 데이터를 상태에 설정
           setPopularCourses(response.data.popularLecture);
+          setFreeCourses(response.data.freeLecture);
           setNewCourses(response.data.newLecture);
         } else {
           console.error('Invalid response format:', response);
@@ -61,25 +63,61 @@ const Home = () => {
   }, []);
 
   const handleSubmit = lectureID => {
-    nav(`/lecture/${lectureID}`);
+    nav(`/lecturesinfo/${lectureID}`);
   };
 
   return (
     <div className='home'>
       <img className='banner-image' src={Banner} alt='banner' />
-
-      <div className='search-container'>
-        <input
-          type='text'
-          placeholder='강의를 검색해보세요'
-          className='search-input'
-        />
-        <button className='search-button'>
-          <Search />
-        </button>
-      </div>
-
       <div className='card-container'>
+        <h1>올잇원 인기 강의 🔥</h1>
+        <p>올잇원 수강생들이 인정한 최고의 강의</p>
+        <div className='popular-courses'>
+          {popularLecture.map(course => (
+            <div
+              className='card'
+              key={course.LectureID}
+              onClick={() => handleSubmit(course.LectureID)}
+            >
+              <img
+                className='card-image'
+                src={course.LectureImageURL}
+                alt='Course'
+              />
+              <div className='card-content'>
+                <h2 className='card-title'>{course.Title}</h2>
+                <p className='card-instructor'>{course.InstructorName}</p>
+                <p className='card-price'>{`${course.PriceDisplay}`}</p>
+                <StarRatings rating={course.AverageRating} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <h1>유료강의보다 좋은 무료 강의 👍</h1>
+        <p>무료 강의부터 가볍게 시작해 보세요.</p>
+        <div className='popular-courses'>
+          {freeLecture.map(course => (
+            <div
+              className='card'
+              key={course.LectureID}
+              onClick={() => handleSubmit(course.LectureID)}
+            >
+              <img
+                className='card-image'
+                src={course.LectureImageURL}
+                alt='Course'
+              />
+              <div className='card-content'>
+                <h2 className='card-title'>{course.Title}</h2>
+                <p className='card-instructor'>{course.InstructorName}</p>
+                <p className='card-price'>{`${course.PriceDisplay}`}</p>
+                <StarRatings rating={course.AverageRating} />
+              </div>
+            </div>
+          ))}
+        </div>
+
         <h1>따끈따끈, 신규 강의 🆕</h1>
         <p>새로운 흥미를 찾아 보세요</p>
         <div className='new-courses'>
@@ -97,36 +135,12 @@ const Home = () => {
               <div className='card-content'>
                 <h2 className='card-title'>{course.Title}</h2>
                 <p className='card-instructor'>{course.InstructorName}</p>
-                <p className='card-price'>{`₩${course.LecturePrice}`}</p>
+                <p className='card-price'>{`${course.PriceDisplay}`}</p>
                 <StarRatings rating={course.AverageRating} />
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      <h1>유료강의보다 좋은 인기 강의 👍</h1>
-      <p>무료 강의부터 가볍게 시작해 보세요.</p>
-      <div className='popular-courses'>
-        {popularLecture.map(course => (
-          <div
-            className='card'
-            key={course.LectureID}
-            onClick={() => handleSubmit(course.LectureID)}
-          >
-            <img
-              className='card-image'
-              src={course.LectureImageURL}
-              alt='Course'
-            />
-            <div className='card-content'>
-              <h2 className='card-title'>{course.Title}</h2>
-              <p className='card-instructor'>{course.InstructorName}</p>
-              <p className='card-price'>{`${course.PriceDisplay}`}</p>
-              <StarRatings rating={course.AverageRating} />
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );

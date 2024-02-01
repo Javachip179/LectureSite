@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Banner from '../../img/banner.png';
 import './style.scss';
@@ -37,6 +37,8 @@ const StarRatings = ({ rating }) => {
 const LectureList = () => {
   const [lectureListData, setLectureListData] = useState([]);
   const location = useLocation();
+  const nav = useNavigate();
+
   // 여기서 state 객체를 통해 전달된 값을 추출합니다.
   const { SubcategoryID, SubcategoryName, CategoryName } = location.state || {};
 
@@ -59,6 +61,10 @@ const LectureList = () => {
     }
   }, [SubcategoryID]);
 
+  const handleSubmit = lectureID => {
+    nav(`/lecturesinfo/${lectureID}`);
+  };
+
   // 강의 목록 렌더링
   return (
     <div className='lecture-list'>
@@ -70,7 +76,11 @@ const LectureList = () => {
       <div className='lectures-container'>
         {lectureListData && lectureListData.length > 0 ? (
           lectureListData.map(course => (
-            <div className='card' key={course.LectureID}>
+            <div
+              className='card'
+              key={course.LectureID}
+              onClick={() => handleSubmit(course.LectureID)}
+            >
               <img
                 className='card-image'
                 src={course.LectureImageURL}

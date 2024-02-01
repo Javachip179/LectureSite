@@ -1,168 +1,213 @@
-import React, { useState } from 'react';
-import './style.scss'; // 가정한 SCSS 파일입니다. 실제 파일 경로에 맞게 수정해주세요.
-
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import jsCookie from 'js-cookie';
+import { baseUrl } from '../../config/baseUrl';
+import DefaultImage from '../../img/defaultProfileImage.png';
+import './style.scss';
+// import { useLocation } from "react-router-dom";
 
 const Cart = () => {
-  // 강의 목록과 선택된 강의들의 상태를 관리합니다.
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      title: 'Node.js 마스터',
-      instructor: '노드마스터',
-      price: 69999,
-      imageUrl:
-        'https://cdn.inflearn.com/public/courses/331985/cover/f0501069-2139-4112-aafa-a9b3a2932860/331985-eng.png',
-      checked: false,
-    },
-    {
-      id: 2,
-      title: 'Node.js 마스터',
-      instructor: '노드마스터',
-      price: 69999,
-      imageUrl:
-        'https://cdn.inflearn.com/public/courses/329963/cover/26550c58-624a-41c8-86dc-fea75b6c3b22/thumbnail-frontnew.png',
-      checked: false,
-    },
-    {
-      id: 3,
-      title: 'Node.js 마스터',
-      instructor: '노드마스터',
-      price: 69999,
-      imageUrl:
-        'https://cdn.inflearn.com/public/courses/329963/cover/26550c58-624a-41c8-86dc-fea75b6c3b22/thumbnail-frontnew.png',
-      checked: false,
-    },
-  ]);
-
-  const userInfo = {
-    name: '이종호',
-    email: 'gher53@naver.com',
-    phoneNumber: '010-3177-2132',
-  };
-
+  const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
-  // 모든 항목을 선택 또는 선택 해제하는 함수입니다.
-  const toggleSelectAll = () => {
-    if (selectedItems.length === cartItems.length) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = jsCookie.get('userToken');
+        const response = await axios.get(`${baseUrl}/api/cart/cartlist`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCartItems(response.data);
+        console.log(cartItems);
+      } catch (error) {
+        console.error('장바구니 정보를 불러오는 중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const totalAmount = selectedItems.reduce((total, selectedIndex) => {
+    const selectedItem = cartItems[selectedIndex];
+
+    // 만약 선택한 항목이 유효하다면 해당 항목의 LecturePrice를 누적합니다.
+    if (selectedItem && selectedItem.LecturePrice) {
+      return total + selectedItem.LecturePrice;
+    }
+
+    // 그렇지 않으면 누적값을 그대로 반환합니다.
+    return total;
+  }, 0);
+
+  const formattedTotalAmount = totalAmount.toLocaleString();
+
+  const selectedRemoveItem = async index => {
+    try {
+      const lectureIds = selectedItems
+        .map(selectedIndex => cartItems[selectedIndex]?.LectureID)
+        .filter(Boolean);
+      const deletePromises = lectureIds.map(async id => {
+        await axios.post(
+          `${baseUrl}/api/cart/delete-lecture`,
+          {
+            LectureID: id,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+      });
+
+      await Promise.all(deletePromises);
+
+      setSelectedItems(prevSelectedItems =>
+        prevSelectedItems.filter(item => item !== index)
+      );
+
+      const updatedCart = cartItems.filter(
+        (_, i) => !selectedItems.includes(i)
+      );
+      setCartItems(updatedCart);
       setSelectedItems([]);
-    } else {
-      setSelectedItems(cartItems.map(item => item.id));
+    } catch (error) {
+      console.error('선택한 강의 삭제 중 오류 발생:', error);
     }
   };
 
-  // 특정 항목을 선택 또는 선택 해제하는 함수입니다.
-  const toggleSelectItem = id => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
+  const removeItem = async (lectureId, index) => {
+    try {
+      // LectureID 속성이 정의되어 있는지 확인
+      if (lectureId) {
+        // 삭제 요청을 서버에 보냄
+        await axios.post(
+          `${baseUrl}/api/cart/delete-lecture`,
+          {
+            LectureID: lectureId,
+          },
+          {
+            withCredentials: true,
+          }
+        );
+
+        // 강의가 성공적으로 삭제된 경우에만 클라이언트 상태 업데이트
+        const updatedCart = cartItems.filter((_, i) => i !== index);
+        setCartItems(updatedCart);
+      } else {
+        console.error('선택한 아이템에 유효한 LectureID가 없습니다.');
+      }
+    } catch (error) {
+      console.error('장바구니 아이템 삭제 중 오류 발생:', error);
     }
   };
 
-  // 선택된 항목을 삭제하는 함수입니다.
-  const deleteSelectedItems = () => {
-    setCartItems(cartItems.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    setSelectedItems(selectAll ? [] : cartItems.map((_, index) => index));
+  };
+
+  const handleCheckboxChange = index => {
+    const isSelected = selectedItems.includes(index);
+
+    if (isSelected) {
+      setSelectedItems(selectedItems.filter(item => item !== index));
+    } else {
+      setSelectedItems([...selectedItems, index]);
+    }
   };
 
   return (
-    <div>
-      <h3 className='cart-title'>장바구니</h3>
-      <div className='cart-page-container'>
-        <div className='left-section'>
-          <div className='cart-header'>
-            <div className='select-all'>
-              <input
-                type='checkbox'
-                id='selectAllCheckbox' // 체크박스의 ID 추가
-                checked={selectedItems.length === cartItems.length}
-                onChange={toggleSelectAll}
-              />
-              <label htmlFor='selectAllCheckbox'>전체 선택</label>{' '}
-              {/* 라벨 연결 */}
-            </div>
-            <button className='delete-selected' onClick={deleteSelectedItems}>
-              선택 삭제
-            </button>
-          </div>
-          <div className='cart-items'>
-            {cartItems.map(item => (
-              <div className='cart-item' key={item.id}>
-                <label
-                  className='checkbox-label'
-                  htmlFor={`checkbox-${item.id}`}
-                >
-                  <input
-                    type='checkbox'
-                    id={`checkbox-${item.id}`} // 각 체크박스마다 고유한 ID 추가
-                    checked={selectedItems.includes(item.id)}
-                    onChange={() => toggleSelectItem(item.id)}
-                  />
-                  <span className='custom-checkbox'></span>{' '}
-                  {/* 커스텀 체크박스 스타일 */}
-                </label>
-                <img
-                  src={item.imageUrl}
-                  alt={item.title}
-                  className='item-image'
+    <div className='wrap cf'>
+      <div className='heading cf'>
+        <div className='cart-title'>장바구니</div>
+      </div>
+      <div className='user-info'>
+        <h3>사용자 정보</h3>
+        <p>이름: {cartItems[0]?.UserName || '이름 없음'}</p>
+        <p>이메일: {cartItems[0]?.UserEmail || '이메일 없음'}</p>
+        <p>휴대폰 번호: {cartItems[0]?.UserCellPhone || '번호 없음'}</p>
+      </div>
+      <div className='cartTop'>
+        <div className='select'>
+          <input
+            className='selectAll'
+            type='checkbox'
+            checked={selectAll}
+            onChange={handleSelectAll}
+          />
+          <span className='selected'>
+            전체선택 {selectedItems.length}/{cartItems.length}
+          </span>
+          <button onClick={selectedRemoveItem}>선택삭제</button>
+        </div>
+      </div>
+      <div className='cart'>
+        <ul className='cartWrap'>
+          {cartItems.map((item, index) => (
+            <li
+              key={index}
+              className={`items ${index % 2 === 0 ? 'even' : 'odd'}`}
+            >
+              <div className='infoWrap'>
+                <input
+                  className='cartChk'
+                  type='checkbox'
+                  checked={selectedItems.includes(index)}
+                  onChange={() => handleCheckboxChange(index)}
                 />
-                <div className='item-details'>
-                  <div className='item-title'>{item.title}</div>
-                  <div className='item-instructor'>{item.instructor}</div>
-                  <div className='item-price'>{`₩${item.price.toLocaleString()}`}</div>
+                <div className='cartSection'>
+                  {item.LectureImageURL ? (
+                    <img
+                      src={item.LectureImageURL}
+                      alt=''
+                      className='itemImg'
+                    />
+                  ) : (
+                    <img
+                      src={DefaultImage}
+                      alt='Default Lecture Image'
+                      className='itemImg'
+                    />
+                  )}
+                  <h3>{item.LectureTitle}</h3>
+                  <p className='cart-instructor'>{item.InstructorName}</p>
                 </div>
-                <div
-                  className='remove-item'
-                  onClick={() => toggleSelectItem(item.id)}
-                >
-                  ×
+                <div className='prodTotal cartSection'>
+                  <p>{item.LecturePrice.toLocaleString()}원</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className='right-section'>
-          <div className='user-info-container'>
-            <div className='user-info'>
-              <div className='info-title'>구매자 정보</div>
-              <div className='info-row'>
-                <div className='info-label'>이름</div>
-                <div className='info-content'>{userInfo.name}</div>
-              </div>
-              <div className='info-row'>
-                <div className='info-label'>이메일</div>
-                <div className='info-content'>{userInfo.email}</div>
-              </div>
-              <div className='info-row'>
-                <div className='info-label'>연락처 번호</div>
-                <div className='info-content'>{userInfo.phoneNumber}</div>
-              </div>
-            </div>
-          </div>
-          <div className='order-summary-container'>
-            <div className='order-summary'>
-              <div className='summary-title'>선택된 강좌 수</div>
-              <div className='summary-row'>
-                <div className='summary-content'>{selectedItems.length}</div>
-                <div className='summary-label'> 개 강좌</div>
-              </div>
-              <div className='summary-row'>
-                <div className='summary-label'>구매할 강좌 합계</div>
-                <div className='summary-content'>
-                  {selectedItems
-                    .reduce((total, id) => {
-                      const item = cartItems.find(item => item.id === id);
-                      return item ? total + item.price : total;
-                    }, 0)
-                    .toLocaleString()}
-                  원
+                <div className='cartSection removeWrap'>
+                  <a
+                    href='#'
+                    className='remove'
+                    onClick={() => removeItem(item.LectureID, index)}
+                  >
+                    x
+                  </a>
                 </div>
               </div>
-              <button className='checkout-button'>결제하기</button>
-            </div>
-          </div>
-        </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className='subtotal cf'>
+        <ul>
+          <li className='totalRow final'>
+            <span className='label'>선택상품 금액</span>
+            <span className='value'>{formattedTotalAmount}원</span>
+            <span className='label'>총 결제금액</span>
+            <span className='value'>{formattedTotalAmount}원</span>
+          </li>
+
+          <li className='totalRow'>
+            <a href='#' className='btn continue'>
+              결제하기
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   );
