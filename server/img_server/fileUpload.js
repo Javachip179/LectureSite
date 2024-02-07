@@ -23,7 +23,7 @@ const upload = multer({ storage: storage });
 router.post('/fileupload', upload.single('profileImage'), async (req, res) => {
   try {
     const userId = verifyTokenAndGetUserId(req, res);
-    const imageName = 'http://localhost:4000/profileImage/' + req.file.filename;
+    const imageName = 'http://localhost:3002/profileImage/' + req.file.filename;
 
     console.log('imageUrl', imageName);
 

@@ -3,16 +3,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import ITTLogo from '../../img/allitone.png';
 import './style.scss';
 import SignIn from '../../pages/auth/signIn/SignIn';
-import { Search } from '@mui/icons-material';
+import { CiSearch } from 'react-icons/ci';
 import { AuthContext } from '../../context/authContext.js';
 import axios from 'axios';
 import { baseUrl } from '../../config/baseUrl.js';
 import Cookies from 'js-cookie';
 import UserIcon from '../../img/defaultProfileImage.png';
-import { FaShoppingCart } from 'react-icons/fa';
+import { CiShoppingCart } from 'react-icons/ci';
 
 const Header = () => {
   const { currentUser, logout } = useContext(AuthContext);
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -56,7 +57,9 @@ const Header = () => {
     fetchMainCategories();
 
     // 다른 의존성이나 상태에 따라 fetchSubCategories를 호출할 수도 있습니다.
-  }, [isLoggedIn]);
+  }, [isLoggedIn, currentUser]);
+
+  console.log('커런트,유저', currentUser);
 
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!isProfileDropdownOpen);
@@ -189,7 +192,7 @@ const Header = () => {
               onChange={onInputChange}
             />
             <button type='submit' disabled={!searchWord}>
-              <Search />
+              <CiSearch />
             </button>
           </form>
         </div>
@@ -198,7 +201,7 @@ const Header = () => {
           {isLoggedIn ? (
             <>
               <button className='cart-button' onClick={() => navigate('/cart')}>
-                <FaShoppingCart />
+                <CiShoppingCart />
               </button>
               <button
                 className='profile'
@@ -206,25 +209,37 @@ const Header = () => {
                 onMouseLeave={closeProfileDropdown}
               >
                 <img
-                  src={currentUser?.ProfileImage || UserIcon}
+                  src={currentUser.ProfileImage || UserIcon}
                   alt='프로필 이미지'
                   className='usericon'
                 />
                 {isProfileDropdownOpen && (
                   <div className='profile-dropdown'>
                     <div className='user-info'>
-                      <img
-                        src={currentUser?.ProfileImage || UserIcon}
-                        alt='프로필 이미지'
-                        className='user-profile-image'
-                      />
-                      <div className='dropdown-profile-info'>
-                        <p className='dropdown-profile-nickname'>
-                          {currentUser?.UserNickname}
-                        </p>
-                        <p className='dropdown-profile-email'>
-                          {currentUser?.UserEmail}
-                        </p>
+                      <div className='dropdown-profile-container'>
+                        {currentUser && currentUser.ProfileImage !== null ? (
+                          <img
+                            src={currentUser.ProfileImage}
+                            alt='프로필 이미지'
+                            className='user-profile-image'
+                          />
+                        ) : (
+                          <img
+                            src={UserIcon}
+                            alt='프로필 이미지'
+                            className='user-profile-image'
+                          />
+                        )}
+                        {currentUser && (
+                          <div className='dropdown-profile-info'>
+                            <p className='dropdown-profile-nickname'>
+                              {currentUser.UserName}
+                            </p>
+                            <p className='dropdown-profile-email'>
+                              {currentUser.UserEmail}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <Link to='/mypage' className='dropdown-item'>
@@ -240,18 +255,26 @@ const Header = () => {
             </>
           ) : (
             <>
-              <div className='in-link' onClick={openModal}>
-                <h6 className='header-text'>로그인</h6>
+              <div className='buttons'>
+                <button className='in-button' onClick={openModal}>
+                  로그인
+                </button>
+                <button
+                  className='up-button'
+                  onClick={() => navigate('/signUp')}
+                >
+                  회원가입
+                </button>
               </div>
-              <Link className='up-link' onClick={() => navigate('/signUp')}>
-                <h6 className='header-text'>회원가입</h6>
-              </Link>
             </>
           )}
+
+          {isModalOpen && (
+            <div className='modal-overlay' onClick={closeModal} />
+          )}
+          {isModalOpen && <SignIn closeModal={closeModal} />}
         </div>
       </div>
-      {isModalOpen && <div className='modal-overlay' onClick={closeModal} />}
-      {isModalOpen && <SignIn closeModal={closeModal} />}
     </div>
   );
 };

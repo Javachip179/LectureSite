@@ -36,11 +36,27 @@ const StarRatings = ({ rating }) => {
 
 const LectureList = () => {
   const [lectureListData, setLectureListData] = useState([]);
+  const [subcategories, setSubcategories] = useState([]); // 서브 카테고리 데이터를 위한 상태 추가
   const location = useLocation();
   const nav = useNavigate();
 
   // 여기서 state 객체를 통해 전달된 값을 추출합니다.
-  const { SubcategoryID, SubcategoryName, CategoryName } = location.state || {};
+  const { SubcategoryID, SubcategoryName, CategoryName, CategoryID } =
+    location.state || {};
+
+  // 서브 카테고리 데이터를 가져오는 useEffect 추가
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/api/subcategories`);
+        setSubcategories(response.data);
+      } catch (error) {
+        console.error('Error fetching subcategories:', error);
+      }
+    };
+    console.log('SubcategoryID:', subcategories);
+    fetchSubcategories();
+  }, []);
 
   useEffect(() => {
     // 서버로부터 강의 목록을 가져오는 함수
@@ -50,6 +66,7 @@ const LectureList = () => {
         const response = await axios.get(
           `${baseUrl}/api/categories/lectures/${SubcategoryID}`
         );
+        console.log('강의 리스트 데이터:', response.data); // API 응답 데이터를 콘솔에 로깅
         setLectureListData(response.data); // 결과를 상태에 저장
       } catch (error) {
         console.error('강의 리스트 가져오는 중 오류 발생:', error);
@@ -60,6 +77,17 @@ const LectureList = () => {
       fetchLectures(); // 서브카테고리 ID가 있을 때만 함수 호출
     }
   }, [SubcategoryID]);
+
+  const handleSelectSubcategory = async SubcategoryID => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/api/categories/lectures/${SubcategoryID}`
+      );
+      setLectureListData(response.data);
+    } catch (error) {
+      console.error('Error fetching lectures:', error);
+    }
+  };
 
   const handleSubmit = lectureID => {
     nav(`/lecturesinfo/${lectureID}`);
@@ -73,6 +101,18 @@ const LectureList = () => {
       <h1>
         {CategoryName} / {SubcategoryName}
       </h1>
+
+      <div className='subcategory-buttons'>
+        {subcategories.map(subcategory => (
+          <button
+            key={subcategory.SubcategoryID}
+            onClick={() => handleSelectSubcategory(subcategory.SubcategoryID)}
+          >
+            {subcategory.SubcategoryName}
+          </button>
+        ))}
+      </div>
+
       <div className='lectures-container'>
         {lectureListData && lectureListData.length > 0 ? (
           lectureListData.map(course => (
@@ -89,7 +129,7 @@ const LectureList = () => {
               <div className='card-content'>
                 <h2 className='card-title'>{course.Title}</h2>
                 <p className='card-instructor'>{course.InstructorName}</p>
-                <p className='card-price'>{`₩${course.LecturePrice}`}</p>
+                <p className='card-price'>{`${course.PriceDisplay}`}</p>
                 <StarRatings rating={course.AverageRating} />
               </div>
             </div>

@@ -2,11 +2,14 @@ const express = require('express');
 const mysql = require('../database/mysql');
 const router = express.Router();
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const verifyTokenAndGetUserId = require('../jwtToken/verifyTokenAndGetUserId');
 router.use(bodyParser.json());
 
 //결제내역
 router.get('/payment', (req, res) => {
-  const userId = req.headers['userid'];
+  const userId = verifyTokenAndGetUserId(req, res);
+  console.log('1111', userId);
 
   // MySQL 연결
   mysql.getConnection((error, conn) => {
@@ -26,7 +29,8 @@ router.get('/payment', (req, res) => {
             l.LectureImageURL,
             l.LecturePrice,
             p.PaymentDate,
-            e.AttendanceRate
+            e.AttendanceRate,
+            p.Payment
         FROM 
             Payments p
         JOIN 

@@ -182,27 +182,50 @@
   
     .links {
       display: flex;
-      align-items: center;
-      margin-left: auto;
-      position: relative; // 상대적 위치 지정
+      justify-content: flex-end; /* 요소들을 오른쪽 끝으로 정렬합니다. */
+      align-items: center; /* 요소들을 세로 방향으로 중앙에 배치합니다. */
+      gap: 10px;
       
-      // 로그인 전의 링크에 고정된 너비를 설정합니다.
-      .in-link,
-      .up-link {
-        padding: 10px 15px;
-        text-decoration: none;
-        font-size: 0.9rem;
-        color: #333;
-        flex: 1; // 요소들이 공간을 균등하게 차지하도록 설정
-        text-align: center; // 텍스트 가운데 정렬
-        min-width: 0px; // 최소 너비 설정
-    
-        h6 {
-          margin: 0;
-          font-weight: normal;
-          font-size: 0.9rem;
-        }
-      }
+/* 로그인 버튼 */
+.in-button {
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  cursor: pointer;
+  /* 버튼이 너무 클 경우, flex-basis 속성을 사용하여 기본 크기를 설정하거나 max-width를 지정할 수 있습니다. */
+  flex-basis: 100px; /* 기본 크기를 설정합니다. */
+  max-width: 100px; /* 최대 너비를 설정합니다. */
+}
+
+/* 회원가입 버튼 */
+.up-button {
+  padding: 8px 16px;
+  background-color: #ff6b6b;
+  color: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  /* 위와 같이 기본 크기와 최대 너비를 설정합니다. */
+  flex-basis: 100px;
+  max-width: 100px;
+}
+
+          /* 로그인 버튼 호버 스타일 */
+  .in-button:hover {
+    background-color: #f2f2f2; /* 호버 시 배경색 변경 */
+  }
+
+  /* 회원가입 버튼 스타일 */
+  .up-button {
+    color: #fff; /* 텍스트 색상을 흰색으로 설정합니다 */
+    background-color: #ff6b6b; /* 배경색을 설정합니다 */
+  }
+
+  /* 회원가입 버튼 호버 스타일 */
+  .up-button:hover {
+    background-color: #e55a5a; /* 호버 시 배경색을 어둡게 변경 */
+  }
+ 
 
 // 프로필 드롭다운 버튼 스타일
 .profile {

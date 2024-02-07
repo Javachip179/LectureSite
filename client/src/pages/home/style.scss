@@ -8,83 +8,149 @@
     margin-bottom: 50px;
   }
 
-  .search-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 50px;
+  .home-container{
+    width: 1200px;
   
-    .search-input {
-      border: 2px solid #ddd; // 경계선 색상 추가
-      border-right: none; // 오른쪽 경계선 제거
-      border-radius: 20px 0 0 20px;
-      padding: 10px 20px;
-      width: 500px;
-      outline: none;
-      background-color: #f9f9f9; // 입력 필드 배경색 변경
-      color: #333; // 입력 텍스트 색상
-  
-      // 입력 필드에 텍스트가 입력되기 전의 상태
-      &::placeholder {
-        color: #aaa; // 플레이스홀더 텍스트 색상
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 50px;
+    
+      .search-input {
+        border: 2px solid #ddd; // 경계선 색상 추가
+        border-right: none; // 오른쪽 경계선 제거
+        border-radius: 20px 0 0 20px;
+        padding: 10px 20px;
+        width: 500px;
+        outline: none;
+        background-color: #f9f9f9; // 입력 필드 배경색 변경
+        color: #333; // 입력 텍스트 색상
+    
+        // 입력 필드에 텍스트가 입력되기 전의 상태
+        &::placeholder {
+          color: #aaa; // 플레이스홀더 텍스트 색상
+        }
+      }
+    
+      .search-button {
+        border: 2px solid #4682B4; // 버튼 경계선 색상 조정
+        border-radius: 0 20px 20px 0;
+        padding: 10px;
+        background-color: #4682B4; // 버튼 배경색
+        cursor: pointer;
+        outline: none;
+    
+        &:hover {
+          background-color: darken(#4682B4, 10%); // 호버 시 버튼 색상 변화
+        }
+    
+        svg {
+          fill: white; // 검색 아이콘 색상
+        }
       }
     }
   
-    .search-button {
-      border: 2px solid #4682B4; // 버튼 경계선 색상 조정
-      border-radius: 0 20px 20px 0;
-      padding: 10px;
-      background-color: #4682B4; // 버튼 배경색
-      cursor: pointer;
-      outline: none;
+    .card-container{
+      margin: 0 100px; /* 상단과 하단은 0, 좌우는 20px의 마진 */
+    
+    h3 { // 텍스트 디자인
+      font-weight: bold; // 제목 폰트 두께
+      color: #333;
+      margin-top: 80px;
+      margin: 0;
   
-      &:hover {
-        background-color: darken(#4682B4, 10%); // 호버 시 버튼 색상 변화
-      }
-  
-      svg {
-        fill: white; // 검색 아이콘 색상
-      }
     }
-  }
-
-  .card-container{
-    margin: 0 100px; /* 상단과 하단은 0, 좌우는 20px의 마진 */
+    p {
+    font-size: 0.875rem; // Smaller font size for the secondary text
+      color: #666; // Lighter text color for the secondary text
+      margin: 0; // Remove default margin
+      margin-bottom: 30px;
+    }
   
-  h3 { // 텍스트 디자인
-    font-weight: bold; // 제목 폰트 두께
-    color: #333;
-    margin-top: 80px;
-    margin: 0;
-
+  // 신규 강의 그리드 설정
+  .new-courses {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 100px;
   }
-  p {
-  font-size: 0.875rem; // Smaller font size for the secondary text
-    color: #666; // Lighter text color for the secondary text
-    margin: 0; // Remove default margin
-    margin-bottom: 30px;
+  
+  // 신규 카드 스타일
+  .new-courses .card {
+    background-color: #fff; // 카드 배경색
+    border-radius: 8px; // 카드 둥근 모서리
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 카드 그림자
+    overflow: hidden; // 내용이 카드 크기를 넘어가지 않도록 처리
+    transition: transform 0.3s ease; // 호버 효과를 위한 전환
+    max-width: 100%;
+  
+    &:hover {
+      transform: translateY(-10px); // 호버 시 카드가 올라오는 효과
+    }
+      // 카드 내 이미지 스타일
+      .card-image {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+    
+      // 카드 내용 스타일
+      .card-content {
+        padding: 15px; // 내부 패딩
+        display: flex; // 자식 요소를 flex로 배치
+        flex-direction: column; // 세로 방향 배치
+        height: 100%;
+    
+        .card-title {
+          font-size: 0.9rem;
+          font-weight: bold;
+          color: #333;
+          display: -webkit-box; // 웹킷 브라우저를 위한 표시 유형 설정
+          -webkit-box-orient: vertical; // 컨텐츠를 수직으로 쌓음
+          -webkit-line-clamp: 2; // 텍스트를 두 줄로 제한
+          overflow: hidden;
+          text-overflow: ellipsis; // 텍스트가 넘칠 때 ellipsis 사용
+          max-width: 300px; // 최대 너비 설정
+          min-height: 2rem;
+        }
+    
+        .card-instructor {
+          font-size: 0.85rem; // 강사 이름 폰트 크기
+          color: #666; // 강사 이름 색상
+        }
+    
+        .card-price {
+          font-size: 1.25rem; // 가격 폰트 크기
+          color: #ff6347; // 가격 색상
+          font-weight: 500; // 가격 폰트 두께
+          }
+        }
+      }
   }
-
-// 신규 강의 그리드 설정
-.new-courses {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 100px;
-}
-
-// 신규 카드 스타일
-.new-courses .card {
-  background-color: #fff; // 카드 배경색
-  border-radius: 8px; // 카드 둥근 모서리
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 카드 그림자
-  overflow: hidden; // 내용이 카드 크기를 넘어가지 않도록 처리
-  transition: transform 0.3s ease; // 호버 효과를 위한 전환
-  max-width: 100%;
-
-  &:hover {
-    transform: translateY(-10px); // 호버 시 카드가 올라오는 효과
+  
+  // 인기 강의 그리드 설정
+  .popular-courses {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
   }
-    // 카드 내 이미지 스타일
+  
+  /* popular-courses 클래스에 속하는 카드의 스타일 */
+  .popular-courses .card {
+    background-color: #fff; // 카드 배경색
+    border-radius: 8px; // 카드 둥근 모서리
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 카드 그림자
+    overflow: hidden; // 내용이 카드 크기를 넘어가지 않도록 처리
+    transition: transform 0.3s ease; // 호버 효과를 위한 전환
+    max-width: 100%;
+    margin-bottom: 150px;
+  
+    &:hover {
+      transform: translateY(-10px); // 호버 시 카드가 올라오는 효과
+    }
+  
+    /* 카드 내 이미지 스타일 */
     .card-image {
       width: 100%;
       height: auto;
@@ -96,7 +162,6 @@
       padding: 15px; // 내부 패딩
       display: flex; // 자식 요소를 flex로 배치
       flex-direction: column; // 세로 방향 배치
-      height: 100%;
   
       .card-title {
         font-size: 0.9rem;
@@ -108,6 +173,7 @@
         overflow: hidden;
         text-overflow: ellipsis; // 텍스트가 넘칠 때 ellipsis 사용
         max-width: 300px; // 최대 너비 설정
+        height: auto; // 높이를 자동으로 설정하여 콘텐츠에 맞춤
         min-height: 2rem;
       }
   
@@ -120,85 +186,23 @@
         font-size: 1.25rem; // 가격 폰트 크기
         color: #ff6347; // 가격 색상
         font-weight: 500; // 가격 폰트 두께
+        margin-top: auto; // 가격을 아래쪽으로 밀어냄
         }
       }
     }
-}
-
-// 인기 강의 그리드 설정
-.popular-courses {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-/* popular-courses 클래스에 속하는 카드의 스타일 */
-.popular-courses .card {
-  background-color: #fff; // 카드 배경색
-  border-radius: 8px; // 카드 둥근 모서리
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 카드 그림자
-  overflow: hidden; // 내용이 카드 크기를 넘어가지 않도록 처리
-  transition: transform 0.3s ease; // 호버 효과를 위한 전환
-  max-width: 100%;
-  margin-bottom: 150px;
-
-  &:hover {
-    transform: translateY(-10px); // 호버 시 카드가 올라오는 효과
-  }
-
-  /* 카드 내 이미지 스타일 */
-  .card-image {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
-
-  // 카드 내용 스타일
-  .card-content {
-    padding: 15px; // 내부 패딩
-    display: flex; // 자식 요소를 flex로 배치
-    flex-direction: column; // 세로 방향 배치
-
-    .card-title {
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #333;
-      display: -webkit-box; // 웹킷 브라우저를 위한 표시 유형 설정
-      -webkit-box-orient: vertical; // 컨텐츠를 수직으로 쌓음
-      -webkit-line-clamp: 2; // 텍스트를 두 줄로 제한
-      overflow: hidden;
-      text-overflow: ellipsis; // 텍스트가 넘칠 때 ellipsis 사용
-      max-width: 300px; // 최대 너비 설정
-      height: auto; // 높이를 자동으로 설정하여 콘텐츠에 맞춤
-      min-height: 2rem;
-    }
-
-    .card-instructor {
-      font-size: 0.85rem; // 강사 이름 폰트 크기
-      color: #666; // 강사 이름 색상
-    }
-
-    .card-price {
-      font-size: 1.25rem; // 가격 폰트 크기
-      color: #ff6347; // 가격 색상
-      font-weight: 500; // 가격 폰트 두께
-      margin-top: auto; // 가격을 아래쪽으로 밀어냄
+  
+    .star-ratings { // 별점 디자인
+      display: flex;
+      align-items: center;
+  
+      .star-ratings-fill {
+        color: #ffcd3c; // 별점 색상
       }
-    }
-  }
-
-  .star-ratings { // 별점 디자인
-    display: flex;
-    align-items: center;
-
-    .star-ratings-fill {
-      color: #ffcd3c; // 별점 색상
-    }
-
-    .star-ratings-base {
-      color: #ccc;
-      position: absolute;
+  
+      .star-ratings-base {
+        color: #ccc;
+        position: absolute;
+      }
     }
   }
 }

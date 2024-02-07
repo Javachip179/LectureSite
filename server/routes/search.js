@@ -23,7 +23,10 @@ router.get('/:searchWord', (req, res) => {
     l.LectureID,
     l.LectureImageURL,
     l.Title,
-    l.LecturePrice,
+    CASE 
+        WHEN l.IsFree = 1 THEN '무료' 
+        ELSE CONCAT(l.LecturePrice, '원') 
+    END AS PriceDisplay,
     i.InstructorName,
     AVG(c.Rating) AS AverageRating
 FROM

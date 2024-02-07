@@ -91,13 +91,16 @@ router.get('/lectures/:SubcategoryID', (req, res) => {
     l.Title,
     i.InstructorName,
     AVG(c2.Rating) AS AverageRating,
-    l.LecturePrice 
+    CASE 
+        WHEN l.IsFree = 1 THEN '무료' 
+        ELSE CONCAT(l.LecturePrice, '원') 
+    END AS PriceDisplay
 FROM 
     Lectures l
 JOIN
     LectureCategory lc ON l.LectureID = lc.LectureID
 JOIN 
-    Subcategory s ON s.SubcategoryID  = lc.SubcategoryID
+    Subcategory s ON s.SubcategoryID = lc.SubcategoryID
 JOIN 
     Comments c2 ON c2.LectureID = l.LectureID
 JOIN
@@ -120,6 +123,37 @@ ORDER BY
 
       // MySQL 연결 종료
       conn.release();
+    });
+  });
+});
+
+// 모든 서브 카테고리 가져오기
+router.get('/subcategories', (req, res) => {
+  // MySQL 연결
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    // SQL 쿼리 실행 to fetch all subcategories
+    const query = `
+    SELECT 
+      SubcategoryID,
+      SubcategoryName
+    FROM 
+      Subcategory;
+    `;
+
+    conn.query(query, (err, results) => {
+      conn.release();
+      if (err) {
+        console.error('쿼리 실행 중 오류 발생:', err);
+        res.status(500).send('Error executing the query');
+        return;
+      }
+      res.json(results); // 모든 서브 카테고리 반환
     });
   });
 });

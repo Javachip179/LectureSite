@@ -39,7 +39,6 @@ const SearchPage = () => {
   const searchWord = location.state?.searchWord;
   const [searchData, setSearchData] = useState(null);
   const nav = useNavigate();
-  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +53,6 @@ const SearchPage = () => {
             },
           }
         );
-        console.log(searchWord);
         setSearchData(response.data);
         console.log('response.data123:  ', response.data);
       } catch (error) {
@@ -83,46 +81,39 @@ const SearchPage = () => {
     <div className='search'>
       <img className='banner-image' src={Banner} alt='banner' />
       <div className='subcategories-container'>
-        {subCategories.map(subCategory => (
-          <button
-            key={subCategory.SubcategoryID}
-            onClick={() =>
-              onSubCategoryClick(
-                subCategory.SubcategoryID,
-                subCategory.SubcategoryName,
-                subCategory.CategoryName
-              )
-            }
-          >
-            {subCategory.SubcategoryName}
-          </button>
-        ))}
-      </div>
-      <h1>전체 강의</h1>
-      <div className='card-container'>
-        {searchData && searchData.length > 0 ? (
-          searchData.map(course => (
-            <div
-              className='card'
-              key={course.LectureID}
-              onClick={() => handleSubmit(course.LectureID)}
-            >
-              <img
-                className='card-image'
-                src={course.LectureImageURL}
-                alt='Course'
-              />
-              <div className='card-content'>
-                <h2 className='card-title'>{course.Title}</h2>
-                <p className='card-instructor'>{course.InstructorName}</p>
-                <p className='card-price'>{`₩${course.LecturePrice}`}</p>
-                <StarRatings rating={course.AverageRating} />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div>검색 강의에 대한 결과가 없습니다.</div>
+        {/* 검색된 강의 제목과 강의 갯수 표시 */}
+        <h1>전체 강의</h1>
+        {searchData && searchData.length > 0 && (
+          <h2>
+            "{searchWord}"에 대한 강의 결과 ({searchData.length})
+          </h2>
         )}
+        <div className='card-container'>
+          {/* 검색 결과가 있으면 강의 카드를 표시하고, 없으면 안내 메시지를 표시 */}
+          {searchData && searchData.length > 0 ? (
+            searchData.map(course => (
+              <div
+                className='card'
+                key={course.LectureID}
+                onClick={() => handleSubmit(course.LectureID)}
+              >
+                <img
+                  className='card-image'
+                  src={course.LectureImageURL}
+                  alt='Course'
+                />
+                <div className='card-content'>
+                  <h2 className='card-title'>{course.Title}</h2>
+                  <p className='card-instructor'>{course.InstructorName}</p>
+                  <p className='card-price'>{course.PriceDisplay}</p>
+                  <StarRatings rating={course.AverageRating} />
+                </div>
+              </div>
+            ))
+          ) : (
+            <div>검색 강의에 대한 결과가 없습니다.</div>
+          )}
+        </div>
       </div>
     </div>
   );

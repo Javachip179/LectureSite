@@ -1,88 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import './style.scss'; // SCSS 스타일 파일을 포함시킵니다.
-import defaultProfileImage from '../../../img/it.png'; // 프로필 이미지를 포함시킵니다.
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import jsCookie from 'js-cookie';
+import { baseUrl } from '../../../config/baseUrl';
 
 const Payment = () => {
-  // 여러 개의 임시 데이터를 배열로 초기 상태 설정
-  const [payments, setPayments] = useState([
-    {
-      paymentId: 1,
-      courseName: '웹 개발 마스터',
-      paymentDate: '2024-01-19 12:00:00',
-      coursePrice: 30000,
-    },
-    {
-      paymentId: 2,
-      courseName: '데이터 사이언스 입문',
-      paymentDate: '2024-01-20 15:30:00',
-      coursePrice: 45000,
-    },
-    {
-      paymentId: 3,
-      courseName: '인공지능 기초',
-      paymentDate: '2024-01-22 11:00:00',
-      coursePrice: 50000,
-    },
-  ]);
+  const [payments, setPayments] = useState([]);
 
   useEffect(() => {
-    // 실제 환경에서는 이 부분에 API 호출 로직이 들어갑니다.
-    // 예: fetchPaymentData 함수를 여기에 정의하고 호출합니다.
-    // 지금은 임시 데이터를 사용하고 있으므로 이 부분은 비워두겠습니다.
-    // 만약 API 호출을 시뮬레이션하고 싶다면 setTimeout을 사용할 수 있습니다.
-    // setTimeout(() => {
-    //   setPaymentData({
-    //     courseName: '웹 개발 마스터',
-    //     paymentDate: '2024-01-19 12:00:00',
-    //     coursePrice: 30000,
-    //   });
-    // }, 1000); // 1초 후에 데이터를 설정합니다.
+    const fetchData = async () => {
+      try {
+        const token = jsCookie.get('userToken');
+
+        const response = await axios.get(`${baseUrl}/api/modify/payment`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // console.log('response.data:  ' + JSON.stringify(response.data));
+        setPayments(response.data);
+        console.log('response.data123:  ', response.data);
+      } catch (error) {
+        console.error('프로필 정보를 불러오는 중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
   }, []);
+  console.log('payments', payments);
 
   return (
     <div className='profile-page'>
-      <header className='profile-header'>
-        <img src={defaultProfileImage} alt='Profile' className='profile-pic' />
-        <h1 className='profile-name'>이종호 님</h1>
-        {/* 사용자의 이름을 표시하세요. */}
-      </header>
-      <div className='profile-nav'>
-        <ul>
-          <li>
-            <NavLink to='/mypage' activeClassName='active'>
-              내 강의
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to='/profile' activeClassName='active'>
-              프로필
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to='/payment' activeClassName='active'>
-              결제내역
-            </NavLink>
-          </li>
-        </ul>
-      </div>
-      <div className='payment-container'>
-        <div className='payment-row-group'>
-          <div className='payment-row payment-title-row'>
-            <div className='payment-title'>결제 번호</div>
-            <div className='payment-title'>강의 이름</div>
-            <div className='payment-title'>결제 날짜</div>
-            <div className='payment-title'>강의 가격</div>
-          </div>
+      <div className='payment'>
+        <div className='payment-card'>
+          <table className='payment-table'>
+            <thead>
+              <tr>
+                <th className='payment-container-no'>번호</th>
+                <th className='payment-container-title'>강의명</th>
+                <th className='payment-container-price'>구매금액</th>
+                <th className='payment-container-date'>구매일</th>
+                <th className='payment-container-modify'>결제수단</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payments.map((payment, index) => (
+                <tr key={index}>
+                  <td className='payment-no'>{index + 1}</td>
+                  <td className='payment-title'>{payment.Title}</td>
+                  <td className='payment-price'>{payment.LecturePrice}</td>
+                  <td className='payment-date'>
+                    {payment.PaymentDate.split('T')[0]}
+                  </td>
+                  <td className='payment-payment'>{payment.Payment}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {payments.map(payment => (
-          <div key={payment.paymentId} className='payment-row payment-info-row'>
-            <div className='payment-info'>{payment.paymentId}</div>
-            <div className='payment-info'>{payment.courseName}</div>
-            <div className='payment-info'>{payment.paymentDate}</div>
-            <div className='payment-info'>{`₩${payment.coursePrice.toLocaleString()}`}</div>
-          </div>
-        ))}
       </div>
     </div>
   );

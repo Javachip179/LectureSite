@@ -6,6 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 const cookieParser = require('cookie-parser');
 
+const subcategoriesRoutes = require('./routes/subcategories');
 const authRoutes = require('./routes/auth');
 const homeRoutes = require('./routes/main');
 const categoriesRoutes = require('./routes/categories');
@@ -41,6 +42,7 @@ app.use('/api/modify', paymentRoutes);
 app.use('/api/lecture', lectureRoutes);
 app.use('/api/enrollment', enrollmentRoutes);
 app.use('/api/file', fileRoute);
+app.use('/api/subcategories', subcategoriesRoutes);
 
 app.listen(3002, () => {
   console.log('Server is running on port 3002');

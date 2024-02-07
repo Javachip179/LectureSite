@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { createContext, useEffect, useState } from 'react';
+import axios from 'axios';
 import { baseUrl } from '../config/baseUrl';
 
 export const AuthContext = createContext();
@@ -28,6 +28,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // 로그아웃 로직
     try {
       const response = await axios.get(`${baseUrl}/api/auth/logout`, {
         withCredentials: true,
@@ -37,6 +38,7 @@ export const AuthContextProvider = ({ children }) => {
       console.error('로그아웃 중 오류:', error);
     }
     setCurrentUser(null);
+    window.location.href = '/';
   };
 
   useEffect(() => {
@@ -44,7 +46,9 @@ export const AuthContextProvider = ({ children }) => {
   }, [currentUser]);
 
   return (
-    <AuthContext.Provider value={{ currentUser, signIn, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, signIn, logout, setCurrentUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

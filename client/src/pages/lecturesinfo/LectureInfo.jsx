@@ -6,6 +6,7 @@ import { baseUrl } from '../../config/baseUrl.js';
 import jsCookie from 'js-cookie';
 import { AuthContext } from '../../context/authContext.js';
 import DefaultImage from '../../img/defaultProfileImage.png';
+import Question from './question/Question.jsx';
 
 const StarRatings = ({ rating }) => {
   const ratingToPercent = () => {
@@ -41,12 +42,12 @@ const LectureInfo = () => {
   const [tocData, setTocData] = useState([]);
   const [categoryData, setCategoryData] = useState({});
   const [commentData, setCommentData] = useState({});
-  const [questionData, setQuestionData] = useState({});
   const [menuStates, setMenuStates] = useState({});
   const { lectureID } = useParams();
   const { currentUser } = useContext(AuthContext);
   const [isInCart, setIsInCart] = useState(false);
   const [isEnrollment, setIsEnrollment] = useState(false);
+  const [selectedItem, setSelectedItem] = useState('강의소개');
 
   const navigate = useNavigate();
 
@@ -77,7 +78,6 @@ const LectureInfo = () => {
         setTocData(response.data.toc);
         setCategoryData(response.data.categories);
         setCommentData(response.data.comments);
-        setQuestionData(response.data.question);
         console.log('questions Data:', response.data.question);
       } catch (error) {
         console.error('강의 정보를 불러오는 중 오류 발생:', error);
@@ -149,7 +149,8 @@ const LectureInfo = () => {
     };
   };
 
-  const handleScrollToSection = sectionId => {
+  const scrollToSection = menuItem => {
+    const sectionId = menuItemToSectionId(menuItem); // 메뉴 아이템 이름을 섹션의 id로 변환하는 함수
     const sectionElement = document.getElementById(sectionId);
     if (sectionElement) {
       sectionElement.scrollIntoView({ behavior: 'smooth' });
@@ -245,6 +246,26 @@ const LectureInfo = () => {
     }
   };
 
+  const handleMenuClick = menuItem => {
+    setSelectedItem(menuItem);
+    scrollToSection(menuItem);
+  };
+
+  const menuItemToSectionId = menuItem => {
+    switch (menuItem) {
+      case '강의소개':
+        return 'introduction';
+      case '강사소개':
+        return 'instructor';
+      case '커리큘럼':
+        return 'curriculum';
+      case '수강평':
+        return 'comment';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className='lecture'>
       <div className='lecture-container'>
@@ -335,150 +356,146 @@ const LectureInfo = () => {
 
       <div className='lecture-card'>
         <div className='lecture-card-button'>
-          <button
-            onClick={() => handleScrollToSection('introduction')}
-            className='lecture-card-introduction'
-          >
-            강의소개
-          </button>
-          <button
-            onClick={() => handleScrollToSection('instructor')}
-            className='lecture-card-instructor'
-          >
-            강사소개
-          </button>
-          <button
-            onClick={() => handleScrollToSection('curriculum')}
-            className='lecture-card-curriculum'
-          >
-            커리큘럼
-          </button>
-          <button
-            onClick={() => handleScrollToSection('comment')}
-            className='lecture-card-comment'
-          >
-            수강평
-          </button>
-          <button>Q&A</button>
+          <button onClick={() => handleMenuClick('강의소개')}>강의소개</button>
+          <button onClick={() => handleMenuClick('강사소개')}>강사소개</button>
+          <button onClick={() => handleMenuClick('커리큘럼')}>커리큘럼</button>
+          <button onClick={() => handleMenuClick('수강평')}>수강평</button>
+          <button onClick={() => setSelectedItem('Q&A')}>Q&A</button>
         </div>
       </div>
       <hr className='lecture-hr' />
 
       <div className='lecture-details-container'>
-        <div className='lecture-details-introcuction' id='introduction'>
-          <h3 className='lecture-details-title'>강의소개</h3>
-          <div className='lecture-details-introcuction-content'>
-            {lectureData &&
-              lectureData[0] &&
-              lectureData[0].Description &&
-              lectureData[0].Description.split('.').map((sentence, index) => (
-                <div key={index}>{sentence.trim()}</div>
-              ))}
-          </div>
-        </div>
-        <hr className='lecture-hr' />
-        <div className='lecture-details-instructor' id='instructor'>
-          <h3 className='lecture-details-title'>강사소개</h3>
-          <div className='lecture-details-instructor-content'>
-            <div>
-              {lectureData && lectureData[0] && lectureData[0].InstructorName}{' '}
-              강사님
+        {selectedItem !== 'Q&A' && (
+          <>
+            <div className='lecture-details-introcuction' id='introduction'>
+              <h3 className='lecture-details-title'>강의소개</h3>
+              <div className='lecture-details-introcuction-content'>
+                {lectureData &&
+                  lectureData[0] &&
+                  lectureData[0].Description &&
+                  lectureData[0].Description.split('.').map(
+                    (sentence, index) => (
+                      <div key={index}>{sentence.trim()}</div>
+                    )
+                  )}
+              </div>
             </div>
-            <div>
-              {lectureData && lectureData[0] && lectureData[0].InstructorEmail}
-            </div>
-            <div>
-              {lectureData &&
-                lectureData[0] &&
-                lectureData[0].InstructorDescription &&
-                lectureData[0].InstructorDescription.split('.').map(
-                  (sentence, index) => <div key={index}>{sentence.trim()}</div>
-                )}
-            </div>
-          </div>
-        </div>
-        <hr className='lecture-hr' />
-
-        <div className='curriculum-container'>
-          <h1 className='title' id='curriculum'>
-            커리큘럼
-          </h1>
-          <ul>
-            {Array.isArray(tocData) &&
-              tocData
-                .filter(menu => menu.ParentTOCID === null)
-                .map((menu, index) => (
-                  <li key={menu.TOCID} className='dropdown'>
-                    <input
-                      type='checkbox'
-                      checked={menuStates[`menu${index + 1}Open`]}
-                      onChange={createToggleFunction(index)}
-                    />
-                    <a
-                      href='#'
-                      data-toggle='dropdown'
-                      onClick={createToggleFunction(index)}
-                    >
-                      {menu.Title}
-                    </a>
-                    {menuStates[`menu${index + 1}Open`] && (
-                      <ul className='dropdown-menu'>
-                        {tocData
-                          .filter(subMenu => subMenu.ParentTOCID === menu.TOCID)
-                          .map((subMenu, subIndex) => (
-                            <li key={subIndex}>
-                              <a
-                                href='#'
-                                onClick={() => watchLectureHandler(lectureID)}
-                              >
-                                {subMenu.Title}
-                              </a>
-                            </li>
-                          ))}
-                      </ul>
+            <hr className='lecture-hr' />
+            <div className='lecture-details-instructor' id='instructor'>
+              <h3 className='lecture-details-title'>강사소개</h3>
+              <div className='lecture-details-instructor-content'>
+                <div>
+                  {lectureData &&
+                    lectureData[0] &&
+                    lectureData[0].InstructorName}{' '}
+                  강사님
+                </div>
+                <div>
+                  {lectureData &&
+                    lectureData[0] &&
+                    lectureData[0].InstructorEmail}
+                </div>
+                <div>
+                  {lectureData &&
+                    lectureData[0] &&
+                    lectureData[0].InstructorDescription &&
+                    lectureData[0].InstructorDescription.split('.').map(
+                      (sentence, index) => (
+                        <div key={index}>{sentence.trim()}</div>
+                      )
                     )}
-                  </li>
-                ))}
-          </ul>
-        </div>
+                </div>
+              </div>
+            </div>
+            <hr className='lecture-hr' />
 
-        <hr className='lecture-hr' />
-        <div className='lecture-details-comment' id='comment'>
-          <h3 className='lecture-details-title'>수강평</h3>
-          <div className='lecture-details-comment-content'>
-            {commentData && Array.isArray(commentData)
-              ? commentData.map(comment => (
-                  <div key={comment.CommentID} className='comment-userInfo'>
-                    <img
-                      className='comment-userImage'
-                      src={comment.ProfileImage || DefaultImage}
-                      alt=''
-                    />
-                    <div className='comment-userInfo-content'>
-                      <div className='comment-userNickname'>
-                        {comment.UserNickname}
-                      </div>
-                      <div className='comment-createDate'>
-                        {comment.WriteDate && (
-                          <>
-                            {
-                              new Date(comment.WriteDate)
-                                .toISOString()
-                                .split('T')[0]
-                            }
-                          </>
+            <div className='curriculum-container' id='curriculum'>
+              <h3 className='lecture-details-title'>커리큘럼</h3>
+              <ul>
+                {Array.isArray(tocData) &&
+                  tocData
+                    .filter(menu => menu.ParentTOCID === null)
+                    .map((menu, index) => (
+                      <li key={menu.TOCID} className='dropdown'>
+                        <input
+                          type='checkbox'
+                          checked={menuStates[`menu${index + 1}Open`]}
+                          onChange={createToggleFunction(index)}
+                        />
+                        <a
+                          href='#'
+                          data-toggle='dropdown'
+                          onClick={createToggleFunction(index)}
+                        >
+                          {menu.Title}
+                        </a>
+                        {menuStates[`menu${index + 1}Open`] && (
+                          <ul className='dropdown-menu'>
+                            {tocData
+                              .filter(
+                                subMenu => subMenu.ParentTOCID === menu.TOCID
+                              )
+                              .map((subMenu, subIndex) => (
+                                <li key={subIndex}>
+                                  <a
+                                    href='#'
+                                    onClick={() =>
+                                      watchLectureHandler(lectureID)
+                                    }
+                                  >
+                                    {subMenu.Title}
+                                  </a>
+                                </li>
+                              ))}
+                          </ul>
                         )}
+                      </li>
+                    ))}
+              </ul>
+            </div>
+
+            <hr className='lecture-hr' />
+            <div className='lecture-details-comment' id='comment'>
+              <h3 className='lecture-details-title'>수강평</h3>
+              <div className='lecture-details-comment-content'>
+                {commentData && Array.isArray(commentData)
+                  ? commentData.map(comment => (
+                      <div key={comment.CommentID} className='comment-userInfo'>
+                        <img
+                          className='comment-userImage'
+                          src={comment.ProfileImage || DefaultImage}
+                          alt=''
+                        />
+                        <div className='comment-userInfo-content'>
+                          <div className='comment-userNickname'>
+                            {comment.UserNickname}
+                          </div>
+                          <div className='comment-createDate'>
+                            {comment.WriteDate && (
+                              <>
+                                {
+                                  new Date(comment.WriteDate)
+                                    .toISOString()
+                                    .split('T')[0]
+                                }
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className='comment-content'>{comment.Content}</div>
+                        <div className='comment-rating'>
+                          평점: {comment.Rating} 점
+                        </div>
                       </div>
-                    </div>
-                    <div className='comment-content'>{comment.Content}</div>
-                    <div className='comment-rating'>
-                      평점: {comment.Rating} 점
-                    </div>
-                  </div>
-                ))
-              : '수강평이 없습니다.'}
-          </div>
-        </div>
+                    ))
+                  : '수강평이 없습니다.'}
+              </div>
+            </div>
+          </>
+        )}
+
+        {selectedItem === 'Q&A' && <Question />}
       </div>
     </div>
   );
