@@ -73,7 +73,7 @@ const Home = () => {
         <div className='card-container'>
           <h1>올잇원 인기 강의 🔥</h1>
           <p>올잇원 수강생들이 인정한 최고의 강의</p>
-          <div className='popular-courses'>
+          <div className='card-courses'>
             {popularLecture.map(course => (
               <div
                 className='card'
@@ -97,7 +97,7 @@ const Home = () => {
 
           <h1>유료강의보다 좋은 무료 강의 👍</h1>
           <p>무료 강의부터 가볍게 시작해 보세요.</p>
-          <div className='popular-courses'>
+          <div className='card-courses'>
             {freeLecture.map(course => (
               <div
                 className='card'
@@ -121,7 +121,7 @@ const Home = () => {
 
           <h1>따끈따끈, 신규 강의 🆕</h1>
           <p>새로운 흥미를 찾아 보세요</p>
-          <div className='new-courses'>
+          <div className='card-courses'>
             {newLecture.map(course => (
               <div
                 className='card'

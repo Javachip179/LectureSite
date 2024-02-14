@@ -1,7 +1,7 @@
 //MySQL 커넥션 풀 생성
 
 const dbconfig = require('../config/dbconfig.json');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 const conn = mysql.createPool({
   host: dbconfig.host,

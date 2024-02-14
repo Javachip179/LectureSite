@@ -28,7 +28,7 @@ router.get('/:lectureId', (req, res) => {
         WHEN l.IsFree = 1 THEN '무료' 
         ELSE CONCAT(FORMAT(l.LecturePrice, 0), '원') 
       END AS PriceDisplay,
-      TIME_FORMAT(l.LectureTime, '%H시%i분') AS FormattedLectureTime
+      TIME_FORMAT(l.LectureTime, '%H시간%i분') AS FormattedLectureTime
     FROM
       Lectures l
     JOIN
@@ -306,6 +306,52 @@ router.post('/add-question', async (req, res) => {
       conn.query(
         'INSERT INTO Question (UserID, LectureID, QuestionContent, CreateDate) VALUES (?, ?, ?, NOW());',
         [userId, lectureId, questionContent, createDate],
+        (err, result) => {
+          console.log(result);
+          if (err) {
+            console.log(err);
+            res.status(500).send('Internal Server Error');
+            return;
+          }
+
+          // 쿼리 완료 후 연결 해제
+          conn.release();
+
+          // 응답 보내기
+          res.status(200).send('Question added successfully');
+        }
+      );
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send('Internal Server Error3');
+  }
+});
+
+// 질문 답변
+router.post('/add-answers', async (req, res) => {
+  try {
+    const questionId = req.body.QuestionID;
+    const userId = req.body.UserID;
+    const content = req.body.Content;
+    const createDate = req.body.CreateDate;
+
+    console.log('Received data:', req.body);
+    console.log('userId:', userId);
+    console.log('questionId:', questionId);
+    console.log('content:', content);
+    console.log('CreateDate:', createDate);
+
+    mysql.getConnection((error, conn) => {
+      if (error) {
+        console.log(error);
+        res.status(500).send('Internal Server Error');
+        return;
+      }
+
+      conn.query(
+        'INSERT INTO Answers (QuestionID, UserID, Content, CreateDate) VALUES (?, ?, ?, NOW());',
+        [questionId, userId, content, createDate],
         (err, result) => {
           console.log(result);
           if (err) {

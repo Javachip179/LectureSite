@@ -20,45 +20,45 @@ router.get('/', (req, res) => {
 
     const popularLectureQuery = `
     SELECT
-      l.LectureID,
-      l.LectureImageURL,
-      l.Title,
-      i.InstructorName,
-      CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
-      AVG(c.Rating) AS AverageRating
-    FROM
-      Lectures l
-    JOIN
-      Instructor i ON l.InstructorID = i.InstructorID
-    JOIN 
-      Comments c ON l.LectureID = c.LectureID 
-    GROUP BY
-      l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
-    ORDER BY
-      AverageRating DESC
-    LIMIT 6;
+    l.LectureID,
+    l.LectureImageURL,
+    l.Title,
+    i.InstructorName,
+    CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
+    AVG(c.Rating) AS AverageRating
+  FROM
+    Lectures l
+  JOIN
+    Instructor i ON l.InstructorID = i.InstructorID
+  JOIN 
+    Comments c ON l.LectureID = c.LectureID 
+  GROUP BY
+    l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
+  ORDER BY
+    AverageRating DESC;
   `;
 
     // SQL 쿼리 실행
     const freeLectureQuery = `
     SELECT
-  l.LectureID,
-  l.LectureImageURL,
-  l.Title,
-  i.InstructorName,
-  CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
-  COALESCE(AVG(c.Rating), 0) AS AverageRating
-FROM
-  Lectures l
-JOIN
-  Instructor i ON l.InstructorID = i.InstructorID
-LEFT JOIN 
-  Comments c ON l.LectureID = c.LectureID
-GROUP BY
-  l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.IsFree
-ORDER BY
-  AverageRating DESC
-LIMIT 6;
+    l.LectureID,
+    l.LectureImageURL,
+    l.Title,
+    i.InstructorName,
+    CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
+    COALESCE(AVG(c.Rating), 0) AS AverageRating
+  FROM
+    Lectures l
+  JOIN
+    Instructor i ON l.InstructorID = i.InstructorID
+  LEFT JOIN 
+    Comments c ON l.LectureID = c.LectureID
+  WHERE
+    l.LecturePrice = 0
+  GROUP BY
+    l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.IsFree
+  ORDER BY
+    AverageRating DESC;  
     `;
 
     const newLectureQuery = `
@@ -78,8 +78,7 @@ LIMIT 6;
         Comments c ON l.LectureID = c.LectureID 
       GROUP BY
         l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.UploadDate
-      ORDER BY l.UploadDate DESC
-      LIMIT 6;
+      ORDER BY l.UploadDate DESC;
     `;
 
     // 병렬로 두 개의 쿼리 실행

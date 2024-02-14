@@ -22,54 +22,63 @@
 
 
   .container {
-    max-width: 1240px;
+    max-width: 1200px;
     margin: 0 auto;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 15px;
 
     .search-bar {
       display: flex;
       align-items: center;
       position: relative;
-      background: #fff; // White background for the search bar
-      border: 1px solid #dcdcdc; // Light grey border, adjust the color as needed
-      border-radius: 5px; // Increased border radius for a more rounded look
-      padding: 5px 10px; // Padding adjusted for visual balance
-      width: 100%; // Full width of the parent container
-      max-width: 550px; // Max width can be adjusted as needed
-      margin-left: auto;
+      background: #fff;
+      border: 1px solid #dcdcdc;
+      border-radius: 5px;
+      padding: 5px; /* Adjust padding to align with the size of the search button */
+      width: 100%;
+      max-width: 550px;
+      
+      form {
+        display: flex;
+        width: 100%; /* Ensure the form takes the full width */
+      }
 
-  
       input {
-        flex-grow: 1;
+        flex-grow: 1; /* Allow input to take up the remaining space */
         border: none;
         outline: none;
-        padding-right: 30px; // Space for the search icon
-        font-size: 16px; // Adjust the font size as needed
-  
+        padding: 1px; /* Padding to match the search bar's visual style */
+        font-size: 16px;
+        box-shadow: none;
+        background: #f6f6f6;
+        color: #5f5f5f;
+        width: 100%; /* Full width of its parent form */
+    
         &::placeholder {
           color: #a9a9a9;
-          font-style: italic; // Often placeholder text is styled italic
+          font-style: italic;
         }
       }
     }
   
-      button {
+      .search-button {
         position: absolute;
-        right: 10px;
-        background: none;
+        right: 5px; /* Position adjusted to align with the padding of the search bar */
         border: none;
+        background: none;
         cursor: pointer;
   
         svg {
           fill: black; // 검색 아이콘 색상
+          width: 18px;
+          height: 18px;
         }
       }
   
     .logo img {
       height: 40px; // 로고의 크기는 이미지에 따라 조정해야 할 수 있습니다.
-      margin-right: 50px;
     }
   
     .drop-down {
@@ -113,7 +122,6 @@
       border: 1px solid #ddd;
       z-index: 1000;
       min-width: 160px;
-      box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
       
       &:before,
       &:after {
@@ -160,10 +168,9 @@
         position: absolute;
         left: 100%; // Position to the right of the parent category
         top: 0;
+        white-space: nowrap; // 서브 메뉴 아이템들이 줄바꿈 되지 않도록 설정
         min-width: 160px;
         background-color: #fff;
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.1);
-        z-index: 1000;
         border: 1px solid #ddd;
         margin-top: -1px;
     
@@ -182,14 +189,13 @@
   
     .links {
       display: flex;
-      justify-content: flex-end; /* 요소들을 오른쪽 끝으로 정렬합니다. */
       align-items: center; /* 요소들을 세로 방향으로 중앙에 배치합니다. */
       gap: 10px;
       
 /* 로그인 버튼 */
 .in-button {
   padding: 8px 16px;
-  background-color: #ffffff;
+  background-color: #5094fa;
   border: 1px solid #dddddd;
   border-radius: 4px;
   cursor: pointer;
@@ -201,6 +207,7 @@
 /* 회원가입 버튼 */
 .up-button {
   padding: 8px 16px;
+  border: 1px solid #dddddd;
   background-color: #ff6b6b;
   color: #ffffff;
   border-radius: 4px;
@@ -208,24 +215,17 @@
   /* 위와 같이 기본 크기와 최대 너비를 설정합니다. */
   flex-basis: 100px;
   max-width: 100px;
+  margin-left: 10px;
 }
 
-          /* 로그인 버튼 호버 스타일 */
-  .in-button:hover {
-    background-color: #f2f2f2; /* 호버 시 배경색 변경 */
+  .in-button{
+    color: #fff;
   }
-
   /* 회원가입 버튼 스타일 */
   .up-button {
     color: #fff; /* 텍스트 색상을 흰색으로 설정합니다 */
     background-color: #ff6b6b; /* 배경색을 설정합니다 */
   }
-
-  /* 회원가입 버튼 호버 스타일 */
-  .up-button:hover {
-    background-color: #e55a5a; /* 호버 시 배경색을 어둡게 변경 */
-  }
- 
 
 // 프로필 드롭다운 버튼 스타일
 .profile {
@@ -234,11 +234,15 @@
   background: none;
   border: none;
   cursor: pointer;
+  position: relative;
+  
+
 
   .usericon {
     border-radius: 50%; // 아이콘을 원형으로 만듬
     width: 30px; // 아이콘 크기 설정
     height: 30px; // 아이콘 크기 설정
+    border: 1px solid #e9ecef;
   }
 
   &:hover {
@@ -251,86 +255,147 @@
 .profile-dropdown {
   display: none; // 기본적으로 숨김
   position: absolute;
-  top: 100%; // 버튼 바로 아래에 위치
+  top: 115%; // 버튼 바로 아래에 위치
   right: 0;
   background-color: #fff; // 배경색
   border: 1px solid #ccc; // 테두리
-  border-radius: 5px; // 둥근 테두리
   box-shadow: 0 2px 5px rgba(0,0,0,0.2); // 그림자 효과
   width: 200px; // 너비 설정
-  z-index: 100; // 다른 요소들 위에 표시
+  z-index: 1000; // 다른 요소들 위에 표시
   padding: 10px; // 내부 여백 추가
   box-sizing: border-box; // 패딩을 너비에 포함
 
-  .user-info {
-    display: flex; // 내부 아이템을 가로로 정렬
-    align-items: center; // 아이템을 세로 중앙에 정렬
-    margin-bottom: 10px; // 아래쪽 항목과의 간격 조정
-
-    .user-profile-image {
-      width: 50px; // 프로필 이미지 크기
-      height: 50px; // 프로필 이미지 크기
-      border-radius: 50%; // 이미지 원형으로 표시
-      margin-right: 10px; // 이미지와 정보 사이 간격 조정
-    }
-
-    .dropdown-profile-nickname, 
-    .dropdown-profile-email {
-      margin: 0; // 기본 마진 제거
-    }
-
-    .dropdown-profile-nickname {
-      font-weight: bold; // 닉네임 볼드 처리
-    }
-
-    .dropdown-profile-email {
-      font-size: 0.8rem; // 이메일 폰트 사이즈
-      color: #777; // 이메일 폰트 색상
-    }
+  &:before,
+  &:after {
+    content: "";
+    position: absolute;
+    top: -10px; /* 삼각형 높이의 두 배 값으로 설정하되, 적절히 조정해야 할 수 있음 */
+    right: calc(50% - 87px); /* 드롭다운 너비의 절반에서 삼각형의 너비 절반 값을 빼줌 */
   }
+  
+  &:before {
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid #ccc; /* 테두리 색상 */
+    z-index: 0;
+  }
+  
+  &:after {
+    border-left: 9px solid transparent; /* border가 더 작아서 테두리가 보이도록 */
+    border-right: 9px solid transparent; /* border가 더 작아서 테두리가 보이도록 */
+    border-bottom: 9px solid #fff; /* 배경 색상 */
+    top: -9px; /* :before보다 조금 아래에 위치 */
+    z-index: 1;
+  }
+  
 
+  .user-info {
+    display: flex;
+    align-items: center; /* 가로 방향으로 중앙 정렬 */
+    margin-bottom: 10px; /* 아래쪽 항목과의 간격 조정 */
+  }
+  
+  .dropdown-profile-container {
+    display: flex;
+    align-items: center; /* 가로 방향으로 중앙 정렬 */
+  }
+  
+  .user-profile-image {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 10px; /* 이미지와 정보 사이 간격 조정 */
+  }
+  
+  .dropdown-profile-info {
+    display: flex;
+    flex-direction: column; /* 수직 쌓기 활성화 */
+    align-items: flex-start; /* 텍스트 왼쪽 정렬 */
+  }
+  
+  .dropdown-profile-nickname,
+  .dropdown-profile-email {
+    margin: 0; /* 기본 마진 제거 */
+  }
+  
+  .dropdown-profile-nickname {
+    font-weight: bold; /* 닉네임 볼드 처리 */
+  }
+  
+  .dropdown-profile-email {
+    font-size: 0.8rem; /* 이메일 폰트 사이즈 */
+    color: #777; /* 이메일 폰트 색상 */
+  }
+  
   .dropdown-item {
+    display: flex;
+    flex-direction: column; /* 자식 요소들을 세로로 쌓음 */
+    align-items: center; /* 수직 방향으로 중앙 정렬 */
+    padding: 10px;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .dropdown-mypage, .dropdown-logout {
     font-size: 0.9rem;
     color: #333;
-    text-align: left; // 텍스트 왼쪽 정렬
-    padding: 10px 0; // 상하 여백 설정, 좌우 여백 제거
-
-    &:hover {
-      background-color: #f7f7f7; // 호버시 배경색 변경
-    }
+    text-align: center; /* 텍스트 중앙 정렬 */
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 수평 방향으로 중앙 정렬 */
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    width: 100%; /* 부모 요소의 전체 너비를 차지하도록 설정 */
+    margin-top: 5px;
+    gap: 5px;
+    transition: background-color 0.3s; /* 호버 효과에 애니메이션을 적용 */
   }
 
-  .dropdown-hr {
-    border: none; // 기본 테두리 제거
-    height: 1px; // 선의 높이 설정
-    background-color: #ccc; // 선의 색상 설정
-    margin: 10px 0; // 상하 여백 설정, 좌우 여백 제거
+  .dropdown-mypage:hover, .dropdown-logout:hover {
+    background-color: #f8f9fa; /* 호버 시 배경색 변경 */
+  }
+  
+  .dropdown-mypage {
+    margin-bottom: 5px; /* 마이페이지와 로그아웃 버튼 사이의 여백 */
+  }
+  
+  .dropdown-logout {
+    cursor: pointer;
+    outline: none;
   }
 }
 
 .cart-button {
+  width: 32px; // 아이콘 크기 설정
+  height: 32px; // 아이콘 크기 설정
+  border: 1px solid #e9ecef;
   background: none;
-  border: 2px solid #333; // 테두리 색상과 두께를 원하는 대로 설정
   border-radius: 50%; // 원형 테두리를 만들기 위해
   cursor: pointer;
   display: inline-flex; // SVG 아이콘을 가운데 정렬하기 위해
   align-items: center; // 수직 가운데 정렬
   justify-content: center; // 수평 가운데 정렬
   padding: 5px; // 테두리와 아이콘 사이의 공간
-  margin-right: 20px; // 다른 요소와의 간격
+  margin-right: 10px; // 다른 요소와의 간격
   transition: background-color 0.3s, transform 0.3s; // 배경색과 변형에 대한 부드러운 전환 효과
+  background-color: #525463;
 
   &:hover {
-    background-color: #f2f2f2; // 호버 시 배경색 변경
+    background-color: #525463; // 호버 시 배경색 변경
   }
 
   svg {
-    fill: #333; // 아이콘 색상 설정
+    fill: #fff; // 아이콘 색상 설정
     width: 20px; // 아이콘 크기 설정
     height: 20px; // 아이콘 크기 설정
     }
   } 
 }
+
 
   }
 }

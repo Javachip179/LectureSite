@@ -3,14 +3,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import ITTLogo from '../../img/allitone.png';
 import './style.scss';
 import SignIn from '../../pages/auth/signIn/SignIn';
-import { CiSearch } from 'react-icons/ci';
+import { GoSearch } from 'react-icons/go';
 import { AuthContext } from '../../context/authContext.js';
 import axios from 'axios';
 import { baseUrl } from '../../config/baseUrl.js';
 import Cookies from 'js-cookie';
 import UserIcon from '../../img/defaultProfileImage.png';
-import { CiShoppingCart } from 'react-icons/ci';
-
+import { BsCart4 } from 'react-icons/bs';
+import { MdLogout, MdOutlineHomeWork } from 'react-icons/md';
 const Header = () => {
   const { currentUser, logout } = useContext(AuthContext);
 
@@ -191,8 +191,12 @@ const Header = () => {
               value={searchWord || ''}
               onChange={onInputChange}
             />
-            <button type='submit' disabled={!searchWord}>
-              <CiSearch />
+            <button
+              className='search-button'
+              type='submit'
+              disabled={!searchWord}
+            >
+              <GoSearch />
             </button>
           </form>
         </div>
@@ -201,7 +205,7 @@ const Header = () => {
           {isLoggedIn ? (
             <>
               <button className='cart-button' onClick={() => navigate('/cart')}>
-                <CiShoppingCart />
+                <BsCart4 />
               </button>
               <button
                 className='profile'
@@ -232,23 +236,29 @@ const Header = () => {
                         )}
                         {currentUser && (
                           <div className='dropdown-profile-info'>
-                            <p className='dropdown-profile-nickname'>
+                            <div className='dropdown-profile-nickname'>
                               {currentUser.UserName}
-                            </p>
-                            <p className='dropdown-profile-email'>
+                            </div>
+                            <div className='dropdown-profile-email'>
                               {currentUser.UserEmail}
-                            </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
-                    <Link to='/mypage' className='dropdown-item'>
-                      마이페이지
-                    </Link>
-                    <hr className='dropdown-hr' />
-                    <button className='dropdown-item' onClick={handleLogout}>
-                      로그아웃
-                    </button>
+                    <div className='dropdown-item'>
+                      <Link to='/mypage' className='dropdown-mypage'>
+                        <MdOutlineHomeWork />
+                        마이페이지
+                      </Link>
+                      <button
+                        className='dropdown-logout'
+                        onClick={handleLogout}
+                      >
+                        <MdLogout />
+                        로그아웃
+                      </button>
+                    </div>
                   </div>
                 )}
               </button>
