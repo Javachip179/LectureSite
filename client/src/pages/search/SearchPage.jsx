@@ -4,6 +4,7 @@ import axios from 'axios';
 import './style.scss';
 import Banner from '../../img/s_banner.png';
 import { baseUrl } from '../../config/baseUrl';
+import { FaStar } from 'react-icons/fa';
 
 const StarRatings = ({ rating }) => {
   const ratingToPercent = () => {
@@ -17,18 +18,38 @@ const StarRatings = ({ rating }) => {
         className='star-ratings-fill space-x-2 text-lg'
         style={{ width: ratingToPercent() + '%' }}
       >
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
       <div className='star-ratings-base space-x-2 text-lg'>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
     </div>
   );
@@ -79,40 +100,49 @@ const SearchPage = () => {
 
   return (
     <div className='search'>
-      <img className='banner-image' src={Banner} alt='banner' />
-      <div className='subcategories-container'>
-        {/* 검색된 강의 제목과 강의 갯수 표시 */}
-        <h1>전체 강의</h1>
-        {searchData && searchData.length > 0 && (
-          <h2>
-            "{searchWord}"에 대한 강의 결과 ({searchData.length})
-          </h2>
-        )}
-        <div className='card-container'>
-          {/* 검색 결과가 있으면 강의 카드를 표시하고, 없으면 안내 메시지를 표시 */}
-          {searchData && searchData.length > 0 ? (
-            searchData.map(course => (
-              <div
-                className='card'
-                key={course.LectureID}
-                onClick={() => handleSubmit(course.LectureID)}
-              >
-                <img
-                  className='card-image'
-                  src={course.LectureImageURL}
-                  alt='Course'
-                />
-                <div className='card-content'>
-                  <h2 className='card-title'>{course.Title}</h2>
-                  <p className='card-instructor'>{course.InstructorName}</p>
-                  <p className='card-price'>{course.PriceDisplay}</p>
-                  <StarRatings rating={course.AverageRating} />
-                </div>
+      <div className='wrapper-container'>
+        <div className='left-wrapper'>
+          <div className='left-wrapper-container'>
+            <img className='banner-image' src={Banner} alt='banner' />
+          </div>
+        </div>
+
+        <div className='right-wrapper'>
+          <div className='right-wrapper-container'>
+            {/* 검색된 강의 제목과 강의 갯수 표시 */}
+            <h3 className='search-title'>전체 강의</h3>
+            {searchData && searchData.length > 0 && (
+              <div className='search-content'>
+                "{searchWord}"에 대한 강의 결과 ({searchData.length})
               </div>
-            ))
-          ) : (
-            <div>검색 강의에 대한 결과가 없습니다.</div>
-          )}
+            )}
+            <div className='card-courses'>
+              {/* 검색 결과가 있으면 강의 카드를 표시하고, 없으면 안내 메시지를 표시 */}
+              {searchData && searchData.length > 0 ? (
+                searchData.map(course => (
+                  <div
+                    className='card'
+                    key={course.LectureID}
+                    onClick={() => handleSubmit(course.LectureID)}
+                  >
+                    <img
+                      className='card-image'
+                      src={course.LectureImageURL}
+                      alt='Course'
+                    />
+                    <div className='card-content'>
+                      <h2 className='card-title'>{course.Title}</h2>
+                      <p className='card-instructor'>{course.InstructorName}</p>
+                      <p className='card-price'>{course.PriceDisplay}</p>
+                      <StarRatings rating={course.AverageRating} />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div>검색 강의에 대한 결과가 없습니다.</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

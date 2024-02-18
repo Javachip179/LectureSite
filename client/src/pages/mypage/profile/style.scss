@@ -1,66 +1,22 @@
-.profile-nav a {
-  // 기본 링크 스타일
-  text-decoration: none;
-  color: #333;
-  padding: 10px;
-  display: block; // 링크를 블록 요소로 만들어 패딩 적용
-}
 
-.profile-nav a.active {
-  border-bottom: 1px solid #4682B4;
-  color: #4682B4;
-}
-
-.profile-header {
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  border-bottom: 1px solid #ccc;
-}
-
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin: 20px;
-}
-
-.profile-name {
-  margin-left: 20px;
-}
-
-.profile-page {
-  font-family: 'Arial', sans-serif;
-}
-
-.profile-nav ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  justify-content: space-evenly;
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 50px;
-}
 // mypage 기본틀 
-
+.profile-page{
+  width: 100%;
 
 .profile-content {
   display: flex;
   width: 100%;
   max-width: 900px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; 
   padding: 20px;
-  border-radius: 10px;
   margin: auto;
-  margin-top: 10px;
+  margin-top: 30px;
 }
 
 .profile-image-container {
   flex-basis: 40%;
   text-align: center;
-  padding-right: 20px;
-  border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +30,7 @@
 }
 
 .btn-upload {
-  background-color: #007bff;
+  background-color: #5094fa;
   color: white;
   border: none;
   border-radius: 10px;
@@ -93,6 +49,9 @@
 .profile-info {
   flex-basis: 60%;
   padding-left: 20px;
+  border-left: 1px solid #f1f3f5;
+  flex-direction: column;
+  display: flex;
 }
 
 .input-label {
@@ -103,7 +62,6 @@
 }
 
 .input-field-n {
-  width: 100%;
   padding: 10px;
   margin-bottom: 5px;
   border: 1px solid #ddd;
@@ -111,7 +69,6 @@
 }
 
 .input-field-e {
-  width: 100%;
   padding: 10px;
   margin-bottom: 5px;
   border: 1px solid #ddd;
@@ -125,23 +82,26 @@
   margin-bottom: 10px;
 }
 
-.btn-save{
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-  width: 120px; // Button should take the full width of the container
-  margin-top: 10px;
-  font-size: 0.8rem;
-  margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽으로 밀어냄
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.btn-save:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
+  .btn-save{
+    background-color: #00c471;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  
+  .btn-save:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
 
 h5 {
   margin-top: 0;
@@ -149,12 +109,17 @@ h5 {
   margin-left: auto;
 }
 
+span{
+  font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
 // 닉네임 및 프로필 변경 scss
 
 .profile-password-change {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
   max-width: 900px;
   margin: auto;
@@ -165,14 +130,15 @@ h5 {
   background: #fff;
   
   .password-input-group {
-    width: 100%;
+    padding-right: 20px;
     margin-bottom: 15px;
 
     label {
       display: block;
-      margin-bottom: 5px;
-      color: #495057;
-      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      font-weight: 400;
+      color: 1b1c1d;
     }
 
     input[type='password'] {
@@ -186,16 +152,13 @@ h5 {
   }
 
   .btn-password-change {
-    background-color: #28a745;
+    background-color: #00c471;
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 10px 20px;
     cursor: pointer;
-    width: 120px; // Button should take the full width of the container
-    margin-top: 10px;
     font-size: 0.8rem;
-    margin-left: auto; // 왼쪽 여백을 자동으로 설정하여 오른쪽으로 밀어냄
   }
 
   .btn-password-change:disabled {
@@ -223,6 +186,7 @@ h5 {
   background: #fff;
   
   h5 {
+    font-size: 1.2rem;
     display: inline; // h5 태그를 인라인 요소로 만듦
     color: #dc3545
   }
@@ -286,4 +250,38 @@ h5 {
     margin-top: 20px; // 체크박스 위의 간격 조정
   }
 
+          /* 체크박스 기본 스타일 초기화 */
+          input[type="checkbox"] {
+            -webkit-appearance: none; /* 크롬, 사파리 */
+            -moz-appearance: none; /* 파이어폭스 */
+            appearance: none; /* 표준 */
+            /* 공통 스타일 */
+            display: inline-block;
+            width: 20px; /* 원하는 너비 */
+            height: 20px; /* 원하는 높이 */
+            background: #fff; /* 배경색 */
+            border: 1px solid #d5dbe2; /* 테두리색 */
+            border-radius: 4px; /* 둥근 모서리 */
+            cursor: pointer; /* 마우스 오버 포인터 */
+            vertical-align: middle; /* 수직 정렬 */
+            position: relative; /* 상대적 위치 */
+          }
+  
+          /* 체크박스 체크 시 스타일 */
+          input[type="checkbox"]:checked {
+            background: #5094fa; /* 체크 시 배경색 */
+          }
+  
+          /* 체크 표시 스타일 */
+          input[type="checkbox"]:checked::after {
+            content: '✔'; /* 체크 표시 */
+            color: #fff; /* 체크 표시 색상 */
+            position: absolute; /* 절대적 위치 */
+            top: 50%; /* 상단에서 50% 위치 */
+            left: 50%; /* 왼쪽에서 50% 위치 */
+            transform: translate(-50%, -50%); /* 정확한 중앙으로 이동 */
+            font-size: 14px; /* 체크 표시 크기 */
+          }
+
+  }
 }

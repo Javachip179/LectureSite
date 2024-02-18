@@ -33,15 +33,12 @@ router.get('/:lectureId', (req, res) => {
       Lectures l
     JOIN
       Instructor i ON l.InstructorID = i.InstructorID
-    JOIN
+    LEFT JOIN
       Comments c ON c.LectureID = l.LectureID
     WHERE
       l.LectureID = ${lectureId}
     GROUP BY
-      l.LectureID,
-      l.InstructorID,
-      c.LectureID,
-      i.InstructorID;
+      l.LectureID;    
       `;
 
       const TOCQuery = `

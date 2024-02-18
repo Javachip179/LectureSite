@@ -26,15 +26,17 @@ router.get('/', (req, res) => {
     i.InstructorName,
     CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
     AVG(c.Rating) AS AverageRating
-  FROM
+FROM
     Lectures l
-  JOIN
+LEFT JOIN
     Instructor i ON l.InstructorID = i.InstructorID
-  JOIN 
+LEFT JOIN 
     Comments c ON l.LectureID = c.LectureID 
-  GROUP BY
+GROUP BY
     l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
-  ORDER BY
+HAVING
+    AVG(c.Rating) IS NOT NULL
+ORDER BY
     AverageRating DESC;
   `;
 
@@ -47,38 +49,38 @@ router.get('/', (req, res) => {
     i.InstructorName,
     CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
     COALESCE(AVG(c.Rating), 0) AS AverageRating
-  FROM
+FROM
     Lectures l
-  JOIN
+JOIN
     Instructor i ON l.InstructorID = i.InstructorID
-  LEFT JOIN 
+LEFT JOIN 
     Comments c ON l.LectureID = c.LectureID
-  WHERE
+WHERE
     l.LecturePrice = 0
-  GROUP BY
-    l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.IsFree
-  ORDER BY
-    AverageRating DESC;  
+GROUP BY
+    l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice
+ORDER BY
+    AverageRating DESC; 
     `;
 
     const newLectureQuery = `
-      SELECT
-        l.LectureID,
-        l.LectureImageURL,
-        l.Title,
-        i.InstructorName,
-        l.LecturePrice,
-        CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
-        l.UploadDate
-      FROM
-        Lectures l
-      JOIN
-        Instructor i ON l.InstructorID = i.InstructorID
-      JOIN 
-        Comments c ON l.LectureID = c.LectureID 
-      GROUP BY
-        l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.UploadDate
-      ORDER BY l.UploadDate DESC;
+    SELECT
+    l.LectureID,
+    l.LectureImageURL,
+    l.Title,
+    i.InstructorName,
+    CASE WHEN l.IsFree = 1 THEN '무료' ELSE CONCAT(l.LecturePrice, '원') END AS PriceDisplay,
+    AVG(c.Rating) AS AverageRating
+FROM
+    Lectures l
+LEFT JOIN
+    Instructor i ON l.InstructorID = i.InstructorID
+LEFT JOIN 
+    Comments c ON l.LectureID = c.LectureID 
+GROUP BY
+    l.LectureID, l.LectureImageURL, l.Title, i.InstructorName, l.LecturePrice, l.UploadDate
+ORDER BY
+    l.UploadDate DESC, AverageRating DESC;
     `;
 
     // 병렬로 두 개의 쿼리 실행

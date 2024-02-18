@@ -71,7 +71,7 @@ ul, ol, li{list-style: none;}
     
     .lecture-rating-count {
       font-size: 0.9em; /* Slightly larger font size for the rating count */
-      color: #666; /* Gold color for the rating count */
+      color: #adb5bd;
       margin-left: 5px; /* Space between the rating stars and count */
     }
     
@@ -155,12 +155,12 @@ ul, ol, li{list-style: none;}
       padding-left: 0; /* 기본 ul의 패딩 제거 */
       margin: 0;
       list-style: none;
-      width: 100%;
-      justify-content: space-evenly;
+      width: 1200px;
+      justify-content: flex-start;
   
       li {
         padding: 10px 0px; /* 내부 패딩 */
-        margin: 0 20px; /* 좌우 마진으로 요소들 사이의 간격 조정 */
+        margin-right: 20px;
         cursor: pointer; /* 마우스 커서를 포인터로 변경 */
         transition: background-color 0.3s; /* 배경색 변경에 대한 트랜지션 적용 */
         text-align: center; /* 텍스트 중앙 정렬 */
@@ -482,6 +482,11 @@ ul, ol, li{list-style: none;}
           font-size: 2.5rem;
           color: #333;
         }
+
+        .no-rating {
+          font-size: 1.5rem;
+          color: #333;
+        }
         
         .star-ratings-star {
           /* Add styles for your star rating component */
@@ -601,22 +606,24 @@ ul, ol, li{list-style: none;}
   }
     
     .right-wrapper {
+      position: relative;
       padding-right: 0;
       flex-basis: 34.333333%;
       max-width: 34.333333%;
-      
     
       .right-wrapper-container{
         margin: 0 34px 20px auto;
         width: 332px;
+        position: -webkit-sticky; /* Safari 브라우저 지원을 위해 */
+        position: sticky; /* 스크롤 시 요소를 고정시키기 위해 */
 
       .lecture-button-card{
-        position: sticky;
         top: 75px; // 화면 상단에서 얼마나 떨어져 있는지 지정합니다.
         border-radius: 8px;
         border: 1px solid #f1f3f5;
         box-shadow: 0 1px 3px 0 rgba(33,37,41,.03);
         background-color: #f8f9fa;
+
       
       .lecture-button-top {
         background-color: #ffffff; /* 배경색 */
@@ -710,4 +717,3 @@ ul, ol, li{list-style: none;}
   padding: 0;
 }
   
-

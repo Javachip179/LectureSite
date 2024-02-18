@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Banner from '../../img/banner.png';
+import Banner from '../../img/s_banner.png';
 import './style.scss';
 import { baseUrl } from '../../config/baseUrl';
+import { FaStar } from 'react-icons/fa';
 
 const StarRatings = ({ rating }) => {
   const ratingToPercent = () => {
@@ -17,18 +18,38 @@ const StarRatings = ({ rating }) => {
         className='star-ratings-fill space-x-2 text-lg'
         style={{ width: ratingToPercent() + '%' }}
       >
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
       <div className='star-ratings-base space-x-2 text-lg'>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
     </div>
   );
@@ -96,47 +117,59 @@ const LectureList = () => {
   // 강의 목록 렌더링
   return (
     <div className='lecture-list'>
-      <img className='banner-image' src={Banner} alt='banner' />
+      <div className='wrapper-container'>
+        <div className='left-wrapper'>
+          <div className='left-wrapper-container'>
+            <img className='banner-image' src={Banner} alt='banner' />
+          </div>
+        </div>
 
-      <h1>
-        {CategoryName} / {SubcategoryName}
-      </h1>
+        <div className='right-wrapper'>
+          <div className='right-wrapper-container'>
+            <h3 className='category-title'>
+              {CategoryName} / {SubcategoryName}
+            </h3>
 
-      <div className='subcategory-buttons'>
-        {subcategories.map(subcategory => (
-          <button
-            key={subcategory.SubcategoryID}
-            onClick={() => handleSelectSubcategory(subcategory.SubcategoryID)}
-          >
-            {subcategory.SubcategoryName}
-          </button>
-        ))}
-      </div>
-
-      <div className='lectures-container'>
-        {lectureListData && lectureListData.length > 0 ? (
-          lectureListData.map(course => (
-            <div
-              className='card'
-              key={course.LectureID}
-              onClick={() => handleSubmit(course.LectureID)}
-            >
-              <img
-                className='card-image'
-                src={course.LectureImageURL}
-                alt='Course'
-              />
-              <div className='card-content'>
-                <h2 className='card-title'>{course.Title}</h2>
-                <p className='card-instructor'>{course.InstructorName}</p>
-                <p className='card-price'>{`${course.PriceDisplay}`}</p>
-                <StarRatings rating={course.AverageRating} />
-              </div>
+            <div className='category-buttons'>
+              {subcategories.map(subcategory => (
+                <button
+                  key={subcategory.SubcategoryID}
+                  onClick={() =>
+                    handleSelectSubcategory(subcategory.SubcategoryID)
+                  }
+                >
+                  {subcategory.SubcategoryName}
+                </button>
+              ))}
             </div>
-          ))
-        ) : (
-          <div>해당 카테고리에 대한 강의가 없습니다.</div>
-        )}
+
+            <div className='card-courses'>
+              {lectureListData && lectureListData.length > 0 ? (
+                lectureListData.map(course => (
+                  <div
+                    className='card'
+                    key={course.LectureID}
+                    onClick={() => handleSubmit(course.LectureID)}
+                  >
+                    <img
+                      className='card-image'
+                      src={course.LectureImageURL}
+                      alt='Course'
+                    />
+                    <div className='card-content'>
+                      <h2 className='card-title'>{course.Title}</h2>
+                      <p className='card-instructor'>{course.InstructorName}</p>
+                      <p className='card-price'>{`${course.PriceDisplay}`}</p>
+                      <StarRatings rating={course.AverageRating} />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div>해당 카테고리에 대한 강의가 없습니다.</div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

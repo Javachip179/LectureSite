@@ -3,16 +3,11 @@ import './style.scss';
 import axios from 'axios';
 import { baseUrl } from '../../../config/baseUrl';
 import jsCookie from 'js-cookie';
-import profileimage from '../../../img/it.png'; // 프로필 이미지를 포함시킵니다.
 
 const MyCourse = () => {
-  const calculateProgressBarStyle = attendanceRate => {
-    return {
-      width: `${attendanceRate}%`,
-    };
-  };
-
   const [mycourses, setMycourses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [coursesPerPage] = useState(8); // 한 페이지에 표시할 강의 수
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +21,8 @@ const MyCourse = () => {
           },
         });
 
+        console.log('서버로부터 받은 mycourses 데이터:', response.data);
+
         setMycourses(response.data);
       } catch (error) {
         console.error('프로필 정보를 불러오는 중 오류 발생:', error);
@@ -35,30 +32,64 @@ const MyCourse = () => {
     fetchData();
   }, []);
 
+  const calculateProgressBarStyle = attendanceRate => {
+    return { width: `${attendanceRate}%` };
+  };
+
+  const indexOfLastCourse = currentPage * coursesPerPage;
+  const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+  const currentCourses = mycourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
+
+  // 페이지 버튼을 렌더링하는 함수
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= Math.ceil(mycourses.length / coursesPerPage); i++) {
+      pageNumbers.push(i);
+    }
+    return pageNumbers.map(number => (
+      <button
+        key={number}
+        onClick={() => paginate(number)}
+        className={currentPage === number ? 'active' : ''}
+      >
+        {number}
+      </button>
+    ));
+  };
+
   return (
-    <div className='my-course'>
-      {mycourses.map((course, index) => (
-        <div key={index} className='my-course-card'>
-          <img
-            className='my-course-image'
-            src={course.LectureImageURL}
-            alt=''
-          />
-          <div className='my-course-title'>{course.LectureTitle}</div>
-          <div className='progress-bar-container'>
-            <div
-              className='my-course-progress'
-              style={calculateProgressBarStyle(course.AttendanceRate)}
-            >
-              {course.AttendanceRate}%
+    <>
+      <div className='my-course'>
+        <div className='my-course-content'>
+          {currentCourses.map((course, index) => (
+            <div key={index} className='course-card'>
+              <img
+                className='course-image'
+                src={course.LectureImageURL}
+                alt={course.Title}
+              />
+              <div className='course-info'>
+                <div className='course-title'>{course.Title}</div>
+                <div className='course-instructor'>{course.InstructorName}</div>
+                <div className='progress-bar-container'>
+                  <div
+                    className='progress-bar'
+                    style={calculateProgressBarStyle(course.AttendanceRate)}
+                  ></div>
+                  <div className='progress-text'>{course.AttendanceRate}%</div>
+                </div>
+              </div>
+              <button className='watch-button'>이어서 학습하기</button>
             </div>
-          </div>
-          <button className='btn btn-primary my-course-continue'>
-            다시보기
-          </button>
+          ))}
         </div>
-      ))}
-    </div>
+        <div className='pagination-container'>
+          <div className='pagination'>{renderPageNumbers()}</div>
+        </div>
+      </div>
+    </>
   );
 };
 

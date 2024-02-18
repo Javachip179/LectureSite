@@ -1,9 +1,20 @@
 import './style.scss';
 import Banner from '../../img/banner.png';
-import { Search } from '@mui/icons-material';
+import { FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { MainAPI } from '../../apis/mainApi.tsx';
 import React, { useEffect, useState } from 'react';
+
+// import Swiper core and required modules
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
 
 const StarRatings = ({ rating }) => {
   const ratingToPercent = () => {
@@ -17,18 +28,38 @@ const StarRatings = ({ rating }) => {
         className='star-ratings-fill space-x-2 text-lg'
         style={{ width: ratingToPercent() + '%' }}
       >
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
       <div className='star-ratings-base space-x-2 text-lg'>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
+        <span>
+          <FaStar />
+        </span>
       </div>
     </div>
   );
@@ -73,9 +104,16 @@ const Home = () => {
         <div className='card-container'>
           <h1>올잇원 인기 강의 🔥</h1>
           <p>올잇원 수강생들이 인정한 최고의 강의</p>
-          <div className='card-courses'>
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={12}
+            slidesPerView={6}
+            navigation
+            onSlideChange={() => console.log('slide change')}
+            onSwiper={swiper => console.log(swiper)}
+          >
             {popularLecture.map(course => (
-              <div
+              <SwiperSlide
                 className='card'
                 key={course.LectureID}
                 onClick={() => handleSubmit(course.LectureID)}
@@ -91,15 +129,22 @@ const Home = () => {
                   <p className='card-price'>{`${course.PriceDisplay}`}</p>
                   <StarRatings rating={course.AverageRating} />
                 </div>
-              </div>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
 
           <h1>유료강의보다 좋은 무료 강의 👍</h1>
           <p>무료 강의부터 가볍게 시작해 보세요.</p>
-          <div className='card-courses'>
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={12}
+            slidesPerView={6}
+            navigation
+            onSlideChange={() => console.log('slide change')}
+            onSwiper={swiper => console.log(swiper)}
+          >
             {freeLecture.map(course => (
-              <div
+              <SwiperSlide
                 className='card'
                 key={course.LectureID}
                 onClick={() => handleSubmit(course.LectureID)}
@@ -115,15 +160,22 @@ const Home = () => {
                   <p className='card-price'>{`${course.PriceDisplay}`}</p>
                   <StarRatings rating={course.AverageRating} />
                 </div>
-              </div>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
 
           <h1>따끈따끈, 신규 강의 🆕</h1>
           <p>새로운 흥미를 찾아 보세요</p>
-          <div className='card-courses'>
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={12}
+            slidesPerView={6}
+            navigation
+            onSlideChange={() => console.log('slide change')}
+            onSwiper={swiper => console.log(swiper)}
+          >
             {newLecture.map(course => (
-              <div
+              <SwiperSlide
                 className='card'
                 key={course.LectureID}
                 onClick={() => handleSubmit(course.LectureID)}
@@ -139,9 +191,9 @@ const Home = () => {
                   <p className='card-price'>{`${course.PriceDisplay}`}</p>
                   <StarRatings rating={course.AverageRating} />
                 </div>
-              </div>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
         </div>
       </div>
     </div>

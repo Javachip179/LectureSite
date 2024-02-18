@@ -76,8 +76,7 @@ router.get('/cartlist', (req, res) => {
     Instructor i ON l.InstructorID = i.InstructorID 
   WHERE 
     u.UserID = '${userId}'
-  ORDER BY c.CreateDate DESC;
-  
+  ORDER BY c.CreateDate DESC;  
     `;
 
     conn.query(query, [userId], (error, results) => {

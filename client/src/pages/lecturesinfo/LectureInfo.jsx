@@ -112,13 +112,14 @@ const LectureInfo = () => {
         setTocData(response.data.toc);
         setCategoryData(response.data.categories);
         setCommentData(response.data.comments);
-        console.log('questions Data:', response.data.comments);
+        console.log('questions Data:', response.data.lecture);
       } catch (error) {
         console.error('강의 정보를 불러오는 중 오류 발생:', error);
       }
     };
 
     fetchData();
+    console.log('lectureData?', lectureData);
 
     const calculateRatingPercentages = comments => {
       const ratingCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -229,25 +230,138 @@ const LectureInfo = () => {
   const LectureEnrollHandler = async () => {
     if (!currentUser) {
       alert('로그인 후 이용해 주세요.');
+      return;
     } else {
       try {
         const token = jsCookie.get('userToken');
-        await axios.post(
-          `${baseUrl}/api/enrollment`,
-          { lectureId: lectureID }, // 수정된 부분
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+
+        // 서버로 결제 요청 데이터 만들기
+        const paymentData = {
+          pg: `${process.env.REACT_APP_PAYMENT_PG}`, // PG사
+          pay_method: 'card', // 결제수단
+          merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+          amount: lectureData[0].LecturePrice, // 결제금액
+          name: lectureData[0].Title, // 주문명
+          buyer_name: currentUser.UserName, // 구매자 이름
+          buyer_email: currentUser.UserEmail, // 구매자 이메일
+        };
+
+        console.log('paymentData', paymentData);
+        console.log(process.env.REACT_APP_IMP_KG_INICIS);
+        console.log(window.IMP);
+
+        // IMP SDK 초기화
+        const { IMP } = window;
+        IMP.init(`${process.env.REACT_APP_IMP_KG_INICIS}`);
+
+        // 결제 요청
+        IMP.request_pay(paymentData, async response => {
+          const { success, error_msg } = response;
+          // console.log("imp_uid1", response.imp_uid);
+          // console.log("merchant_uid1", response.merchant_uid);
+          // console.log("payment_amount1", response.paid_amount);
+          const imp_uid = response.imp_uid;
+          const merchant_uid = response.merchant_uid;
+          const payment_amount = response.paid_amount;
+          if (success) {
+            try {
+              // 결제 검증을 위한 서버 요청
+              const verificationResponse = await axios.post(
+                `${baseUrl}/api/modify/payment-verify`,
+                {
+                  imp_uid: imp_uid,
+                  merchant_uid: merchant_uid,
+                  payment_amount: payment_amount,
+                },
+                {
+                  withCredentials: true,
+                }
+              );
+
+              // console.log(
+              //   "verificationResponse.data",
+              //   verificationResponse.data
+              // );
+              const cardName = verificationResponse.data.cardName;
+              // console.log("cardName", cardName);
+              if (verificationResponse.data.success) {
+                // 서버로 수강 등록 요청
+                const enrollmentResponse = await axios.post(
+                  `${baseUrl}/api/enrollment`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const paymentResponse = await axios.post(
+                  `${baseUrl}/api/modify`,
+                  { lectureId: lectureID, cardName: cardName },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const cartResponse = await axios.post(
+                  `${baseUrl}/api/cart/delete-lecture`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                console.log(
+                  'enrollmentResponse.data.success?',
+                  enrollmentResponse.data
+                );
+                console.log(
+                  'paymentResponse.data.success?',
+                  paymentResponse.data
+                );
+                console.log('cartResponse.data', cartResponse.data);
+
+                // 수강 등록이 성공한 경우
+                if (
+                  enrollmentResponse.data ===
+                    '강의 수강 신청이 완료되었습니다.' &&
+                  paymentResponse.data.success &&
+                  cartResponse.data === '삭제 성공'
+                ) {
+                  alert('수강 등록 및 결제가 성공했습니다.');
+
+                  window.location.reload();
+                } else {
+                  // 수강 등록이 실패한 경우에 대한 처리
+                  alert('수강 등록에 실패했습니다.');
+                  return;
+                }
+              } else {
+                // 결제 검증 실패
+                alert('결제 검증에 실패했습니다.');
+                return;
+              }
+            } catch (error) {
+              console.error('API 호출 중 오류:', error);
+              alert('결제 요청 중 오류가 발생했습니다.');
+              return;
+            }
+          } else {
+            alert(`결제 실패: ${error_msg}`);
+            return;
           }
-        );
-
-        // 결제하기
-
-        setIsEnrollment(true);
+        });
       } catch (error) {
         console.error('API 호출 중 오류:', error);
+        alert('결제 요청 중 오류가 발생했습니다.');
+        return;
       }
     }
   };
@@ -259,6 +373,10 @@ const LectureInfo = () => {
       try {
         const token = jsCookie.get('userToken');
 
+        if (lectureData[0].LecturePrice === 0) {
+          alert('무료 강의는 장바구니에 담을 수 없습니다.');
+          return;
+        }
         // 이미 장바구니에 담겨있는지 확인
         if (isInCart) {
           alert('이미 장바구니에 담겨있습니다.');
@@ -530,7 +648,11 @@ const LectureInfo = () => {
                     </div>
                     <div className='rating-dashboard'>
                       <div className='star-ratings-dashboard'>
-                        <div className='star-ratings-num'>
+                        <div
+                          className={`star-ratings-num ${
+                            commentData.length === 0 ? 'no-rating' : ''
+                          }`}
+                        >
                           {commentData.length > 0
                             ? `${calculateAverageRating().toFixed(1)}`
                             : '(평점 정보 없음)'}

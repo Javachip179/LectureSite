@@ -285,20 +285,23 @@ router.get('/cours', (req, res) => {
 
     // SQL 쿼리 실행
     const query = `
-        SELECT 
-            u.UserID,
-            l.LectureID,
-            l.Title,
-            l.LectureImageURL,
-            e.AttendanceRate 
-        FROM 
-            Enrollments e  
-        JOIN 
-            Users u ON e.UserID = u.UserID 
-        JOIN
-            Lectures l ON e.LectureID = l.LectureID 
-        WHERE 
-            u.UserID = '${userId}' AND e.PaymentStatus = TRUE;
+    SELECT 
+    u.UserID,
+    l.LectureID,
+    l.Title,
+    l.LectureImageURL,
+    e.AttendanceRate,
+    i.InstructorName -- 추가된 부분
+FROM 
+    Enrollments e  
+JOIN 
+    Users u ON e.UserID = u.UserID 
+JOIN
+    Lectures l ON e.LectureID = l.LectureID 
+JOIN
+    Instructor i ON l.InstructorID = i.InstructorID -- 추가된 조인
+WHERE 
+    u.UserID = '${userId}' AND e.PaymentStatus = TRUE;
       `;
 
     conn.query(query, [userId], (error, results) => {

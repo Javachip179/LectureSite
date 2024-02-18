@@ -4,6 +4,9 @@ import './style.scss';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import ITTLogo from '../../../img/allitone.png';
 import { AuthContext } from '../../../context/authContext';
+import KakaoLogin from 'react-kakao-login';
+import axios from 'axios';
+import { baseUrl } from '../../../config/baseUrl.js';
 
 const SignIn = ({ closeModal }) => {
   const [passwordShown, setPasswordShown] = useState(false);
@@ -13,6 +16,9 @@ const SignIn = ({ closeModal }) => {
 
   const { signIn } = useContext(AuthContext);
   const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태
+
+  const kakaoClientId = process.env.REACT_APP_KAKAO_CLIENT_ID;
+  // console.log("Kakao client", kakaoClientId)
 
   const handleSignIn = async e => {
     e.preventDefault();
@@ -27,6 +33,35 @@ const SignIn = ({ closeModal }) => {
         '등록되지 않은 아이디이거나 아이디 또는 비밀번호가 일치하지 않습니다.'
       ); // 알림으로 오류 메시지 표시
     }
+  };
+
+  const kakaoOnSuccess = async data => {
+    const idToken = data.response.access_token;
+    if (idToken) {
+      try {
+        const response = await axios.post(
+          `${baseUrl}/api/auth/kakao/callback`,
+          { idToken },
+          { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+          signIn(response.data.UserEmail, response.data.Password);
+          closeModal();
+          window.location.reload();
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          alert(error.response.data.message); // 중복된 이메일 알림 표시
+        } else {
+          console.error('인증 중 오류:', error);
+        }
+      }
+    }
+  };
+
+  const kakaoOnFailure = error => {
+    window.location.href = 'http://localhost:3000';
   };
 
   const togglePasswordVisibility = () => {
@@ -94,9 +129,24 @@ const SignIn = ({ closeModal }) => {
             </button>
 
             {/* 카카오톡 로그인 버튼 */}
-            <button type='button' className='kakao-signin'>
+            {/* <button type='button' className='kakao-signin'>
               카카오톡 로그인
-            </button>
+            </button> */}
+            <KakaoLogin
+              className='kakao-signin'
+              token={kakaoClientId}
+              onSuccess={kakaoOnSuccess}
+              onFail={kakaoOnFailure}
+              style={{
+                width: '100%',
+                padding: '10px',
+                backgroundColor: '#fae100',
+                color: 'black',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+              }}
+            />
           </form>
         </div>
       </div>

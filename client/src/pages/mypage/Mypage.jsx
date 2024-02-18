@@ -20,46 +20,50 @@ const MyPage = () => {
   };
 
   return (
-    <div className='profile-page'>
-      <header className='profile-header'>
-        <img
-          src={currentUser.ProfileImage || defaultProfileImage}
-          alt='Profile'
-          className='profile-pic'
-        />
-        <h1 className='profile-name'>{currentUser.UserNickname}님</h1>{' '}
-        {/* 사용자의 이름을 표시하세요. */}
-      </header>
+    <div className='mypage'>
+      <div className='mypage-header'>
+        <div className='mypage-header-content'>
+          <img
+            src={currentUser.ProfileImage || defaultProfileImage}
+            alt='Profile'
+            className='profile-img'
+          />
+          <h1 className='profile-name'>{currentUser.UserNickname}님</h1>{' '}
+          {/* 사용자의 이름을 표시하세요. */}
+        </div>
+      </div>
 
-      <nav className='profile-nav'>
-        <ul className='profile-list'>
-          <li
-            onClick={() => handleItemClick('수강중인 강의')}
-            className={`list-group-item ${
-              selectedItem === '수강중인 강의' && 'active'
-            }`}
-          >
-            수강중인 강의
-          </li>
-          <li
-            onClick={() => handleItemClick('프로필')}
-            className={`list-group-item ${
-              selectedItem === '프로필' && 'active'
-            }`}
-          >
-            프로필
-          </li>
-          <li
-            onClick={() => handleItemClick('결제내역')}
-            className={`list-group-item ${
-              selectedItem === '결제내역' && 'active'
-            }`}
-          >
-            결제내역
-          </li>
-        </ul>
-        <div className='vl'></div>
-        <div className='profile-content-container'>
+      <nav className='mypage-content'>
+        <div className='mypage-card'>
+          <ul className='mypage-card-button'>
+            <li
+              onClick={() => handleItemClick('수강중인 강의')}
+              className={`list-group-item ${
+                selectedItem === '수강중인 강의' && 'active'
+              }`}
+            >
+              <span>수강중인 강의</span>
+            </li>
+            <li
+              onClick={() => handleItemClick('프로필')}
+              className={`list-group-item ${
+                selectedItem === '프로필' && 'active'
+              }`}
+            >
+              <span>프로필</span>
+            </li>
+            <li
+              onClick={() => handleItemClick('결제내역')}
+              className={`list-group-item ${
+                selectedItem === '결제내역' && 'active'
+              }`}
+            >
+              <span>결제내역</span>
+            </li>
+          </ul>
+        </div>
+
+        <div className='mypage-content-container'>
           {selectedItem === '수강중인 강의' && <MyCourses />}
           {selectedItem === '프로필' && <Profile />}
           {selectedItem === '결제내역' && <Payment />}

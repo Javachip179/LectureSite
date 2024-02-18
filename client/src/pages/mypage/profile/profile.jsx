@@ -23,6 +23,7 @@ const Profile = ({ initialName, initialEmail }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const { currentUser, logout, setCurrentUser } = useContext(AuthContext);
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
 
   const [profileInfo, setProfileInfo] = useState({
     UserName: '',
@@ -154,6 +155,7 @@ const Profile = ({ initialName, initialEmail }) => {
           alert('탈퇴되었습니다.');
           jsCookie.remove('userToken');
           localStorage.removeItem('user');
+          window.location.reload();
           navigate('/');
         } catch (error) {
           console.error('회원탈퇴 중 오류 발생:', error);
@@ -185,6 +187,7 @@ const Profile = ({ initialName, initialEmail }) => {
 
       setNicknameChanged(false);
       alert('닉네임 변경이 완료되었습니다.');
+      window.location.reload();
     } catch (error) {
       if (error.response && error.response.status === 400) {
         alert('이미 사용 중인 닉네임입니다. 다른 닉네임을 시도해주세요.');
@@ -223,10 +226,33 @@ const Profile = ({ initialName, initialEmail }) => {
         }
       );
       alert('비밀번호가 성공적으로 변경되었습니다.');
+      window.location.reload();
     } catch (error) {
       alert('비밀번호 변경에 실패했습니다. ' + error.response.data);
       console.error('비밀번호 변경 중 오류 발생:', error);
     }
+  };
+
+  // 새 비밀번호 입력 변경 핸들러
+  const onPasswordChange = event => {
+    const newPass = event.target.value;
+    setNewPassword(newPass);
+    // 입력 값이 변경될 때마다 비밀번호 일치 여부 검사
+    checkPasswordsMatch(newPass, confirmPassword);
+  };
+
+  // 비밀번호 확인 입력 변경 핸들러
+  const onConfirmPasswordChange = event => {
+    const confirmPass = event.target.value;
+    setConfirmPassword(confirmPass);
+    // 입력 값이 변경될 때마다 비밀번호 일치 여부 검사
+    checkPasswordsMatch(newPassword, confirmPass);
+  };
+
+  // 비밀번호 일치 여부 검사 함수
+  const checkPasswordsMatch = (newPass, confirmPass) => {
+    // 두 값이 비어 있지 않고 동일한 경우에만 passwordsMatch를 true로 설정
+    setPasswordsMatch(newPass && confirmPass && newPass === confirmPass);
   };
 
   return (
@@ -265,7 +291,7 @@ const Profile = ({ initialName, initialEmail }) => {
         </div>
         <div className='profile-info'>
           <label className='input-label'>
-            닉네임
+            <span>닉네임</span>
             <input
               type='text'
               value={profileInfo.UserNickname}
@@ -275,7 +301,7 @@ const Profile = ({ initialName, initialEmail }) => {
             />
           </label>
           <label className='input-label'>
-            이메일
+            <span>이메일</span>
             <input
               type='email'
               value={profileInfo.UserEmail}
@@ -285,15 +311,19 @@ const Profile = ({ initialName, initialEmail }) => {
             />
             <span className='email-message'>이메일은 변경할 수 없습니다.</span>
           </label>
-          <button
-            onClick={onNicknameChangeButtonClick}
-            className='btn-save'
-            disabled={!nicknameChanged}
-          >
-            변경 사항 저장
-          </button>
+          {/* 버튼을 profile-info 안으로 이동 */}
+          <div className='btn-container'>
+            <button
+              onClick={onNicknameChangeButtonClick}
+              className='btn-save'
+              disabled={!nicknameChanged}
+            >
+              변경 사항 저장
+            </button>
+          </div>
         </div>
       </div>
+
       {/* 비밀번호 변경 */}
       <div className='profile-password-change'>
         <form onSubmit={handlePasswordChange}>
@@ -314,7 +344,7 @@ const Profile = ({ initialName, initialEmail }) => {
               id='new-password'
               type='password'
               value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
+              onChange={onPasswordChange}
               placeholder='새로운 비밀번호 입력'
               className='input-field'
             />
@@ -325,13 +355,19 @@ const Profile = ({ initialName, initialEmail }) => {
               id='confirm-password'
               type='password'
               value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
+              onChange={onConfirmPasswordChange}
               placeholder='새로운 비밀번호 확인'
               className='input-field'
             />
           </div>
-          <button type='submit'>비밀번호 변경</button>
         </form>
+        <button
+          className='btn-password-change'
+          onClick={handlePasswordChange}
+          disabled={!passwordsMatch}
+        >
+          비밀번호 변경
+        </button>
       </div>
       {/* 회원탈퇴 섹션 */}
       <div className='account-deletion-section'>
@@ -344,7 +380,7 @@ const Profile = ({ initialName, initialEmail }) => {
           건 어떨까요? <br />
           그래도 탈퇴하시겠다면 탈퇴 전에 아래 유의사항을 꼭 읽어주세요! <br />
           🙇🏻‍♂️ 감사합니다 🙇🏻‍♀️ <br />
-          <div class='divider'>유의사항</div>
+          <div class='divider'>💡 유의사항 💡</div>
           <br /> 1.계정 탈퇴 시, 올잇원과 랠릿 서비스에서 모두 탈퇴됩니다.
           <br />
           2.탈퇴 시 계정과 관련된 모든 권한이 사라지며 복구할 수 없습니다.

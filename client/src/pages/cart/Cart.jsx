@@ -112,102 +112,143 @@ const Cart = () => {
   const handleCheckboxChange = index => {
     const isSelected = selectedItems.includes(index);
 
-    if (isSelected) {
-      setSelectedItems(selectedItems.filter(item => item !== index));
-    } else {
-      setSelectedItems([...selectedItems, index]);
-    }
+    // 선택된 항목 배열을 업데이트합니다.
+    const updatedSelectedItems = isSelected
+      ? selectedItems.filter(item => item !== index)
+      : [...selectedItems, index];
+
+    setSelectedItems(updatedSelectedItems);
+
+    // 모든 항목이 선택되었는지 확인하고, 전체 선택 상태를 업데이트합니다.
+    setSelectAll(updatedSelectedItems.length === cartItems.length);
   };
 
   return (
-    <div className='wrap cf'>
-      <div className='heading cf'>
-        <div className='cart-title'>장바구니</div>
+    <div className='cart'>
+      <div className='title-container'>
+        <h3 className='cart-title'>장바구니</h3>
       </div>
-      <div className='user-info'>
-        <h3>사용자 정보</h3>
-        <p>이름: {cartItems[0]?.UserName || '이름 없음'}</p>
-        <p>이메일: {cartItems[0]?.UserEmail || '이메일 없음'}</p>
-        <p>휴대폰 번호: {cartItems[0]?.UserCellPhone || '번호 없음'}</p>
-      </div>
-      <div className='cartTop'>
-        <div className='select'>
-          <input
-            className='selectAll'
-            type='checkbox'
-            checked={selectAll}
-            onChange={handleSelectAll}
-          />
-          <span className='selected'>
-            전체선택 {selectedItems.length}/{cartItems.length}
-          </span>
-          <button onClick={selectedRemoveItem}>선택삭제</button>
-        </div>
-      </div>
-      <div className='cart'>
-        <ul className='cartWrap'>
-          {cartItems.map((item, index) => (
-            <li
-              key={index}
-              className={`items ${index % 2 === 0 ? 'even' : 'odd'}`}
-            >
-              <div className='infoWrap'>
+      <div className='wrapper-container'>
+        <div className='left-wrapper'>
+          <div className='left-wrapper-container'>
+            <div className='cartTop'>
+              <div className='select'>
                 <input
-                  className='cartChk'
+                  className='selectAll'
                   type='checkbox'
-                  checked={selectedItems.includes(index)}
-                  onChange={() => handleCheckboxChange(index)}
+                  checked={selectAll}
+                  onChange={handleSelectAll}
                 />
-                <div className='cartSection'>
-                  {item.LectureImageURL ? (
-                    <img
-                      src={item.LectureImageURL}
-                      alt=''
-                      className='itemImg'
-                    />
-                  ) : (
-                    <img
-                      src={DefaultImage}
-                      alt='Default Lecture Image'
-                      className='itemImg'
-                    />
-                  )}
-                  <h3>{item.LectureTitle}</h3>
-                  <p className='cart-instructor'>{item.InstructorName}</p>
-                </div>
-                <div className='prodTotal cartSection'>
-                  <p>{item.LecturePrice.toLocaleString()}원</p>
-                </div>
-                <div className='cartSection removeWrap'>
-                  <a
-                    href='#'
-                    className='remove'
-                    onClick={() => removeItem(item.LectureID, index)}
+                <span className='selected'>
+                  전체선택 {selectedItems.length}/{cartItems.length}
+                </span>
+                <button className='removeBtn' onClick={selectedRemoveItem}>
+                  선택삭제
+                </button>
+              </div>
+            </div>
+            <div className='cart-content'>
+              <ul className='cartWrap'>
+                {cartItems.map((item, index) => (
+                  <li
+                    key={index}
+                    className={`items ${index % 2 === 0 ? 'even' : 'odd'}`}
                   >
-                    x
-                  </a>
+                    <div className='infoWrap'>
+                      <input
+                        className='cartChk'
+                        type='checkbox'
+                        checked={selectedItems.includes(index)}
+                        onChange={() => handleCheckboxChange(index)}
+                      />
+                      <div className='cartSection'>
+                        {item.LectureImageURL ? (
+                          <img
+                            src={item.LectureImageURL}
+                            alt=''
+                            className='itemImg'
+                          />
+                        ) : (
+                          <img
+                            src={DefaultImage}
+                            alt='Default Lecture Image'
+                            className='itemImg'
+                          />
+                        )}
+                        <div className='itemInfo'>
+                          <a className='cart-lecture-title'>{item.Title}</a>
+                          <span className='cart-instructor'>
+                            {item.InstructorName}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='qtyWrap'>
+                      <div className='prodTotal'>
+                        <a className='price-wrap'>
+                          {item.LecturePrice.toLocaleString()}원
+                        </a>
+                      </div>
+                      <div className='removeWrap'>
+                        <a
+                          href='#'
+                          className='remove'
+                          onClick={() => removeItem(item.LectureID, index)}
+                        >
+                          x
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className='right-wrapper'>
+          <div className='right-wrapper-container'>
+            <div className='cart-buttons'>
+              <div className='user-info'>
+                <span className='info'>사용자 정보</span>
+                <div className='user-detail'>
+                  <p className='label'>이름:</p>
+                  <p className='value'>
+                    {cartItems[0]?.UserName || '이름 없음'}
+                  </p>
+                </div>
+                <div className='user-detail'>
+                  <p className='label'>이메일:</p>
+                  <p className='value'>
+                    {cartItems[0]?.UserEmail || '이메일 없음'}
+                  </p>
+                </div>
+                <div className='user-detail'>
+                  <p className='label'>휴대폰 번호:</p>
+                  <p className='value'>
+                    {cartItems[0]?.UserCellPhone || '번호 없음'}
+                  </p>
                 </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      </div>
 
-      <div className='subtotal cf'>
-        <ul>
-          <li className='totalRow final'>
-            <span className='label'>선택상품 금액</span>
-            <span className='value'>{formattedTotalAmount}원</span>
-            <span className='label'>총 결제금액</span>
-            <span className='value'>{formattedTotalAmount}원</span>
-          </li>
-
-          <li className='totalRow'>
-            <a href='#' className='btn continue'>
-              결제하기
-            </a>
-          </li>
-        </ul>
+              <div className='subtotal'>
+                <div className='total-info'>
+                  <div className='total-detail'>
+                    <p className='label'>선택상품 금액</p>
+                    <p className='label'>{formattedTotalAmount}원</p>
+                  </div>
+                  <div className='total-detail'>
+                    <p className='value'>총 결제금액</p>
+                    <p className='value'>{formattedTotalAmount}원</p>
+                  </div>
+                </div>
+                <button href='#' className='btn-continue'>
+                  결제하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
