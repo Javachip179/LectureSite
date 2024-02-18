@@ -110,7 +110,6 @@ router.post('/payment-verify', async (req, res) => {
       paymentData.response.status == 'paid'
     ) {
       // 결제 검증 성공
-      // 결제 검증 성공
       return res.json({
         success: true,
         status: paymentData.response.status,

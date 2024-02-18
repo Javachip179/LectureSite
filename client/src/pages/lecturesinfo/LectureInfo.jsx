@@ -227,6 +227,23 @@ const LectureInfo = () => {
     }
   };
 
+  useEffect(() => {
+    if (!window.IMP) {
+      // IMP 객체가 없다면 스크립트 로드
+      const script = document.createElement('script');
+      script.src = 'https://cdn.iamport.kr/js/iamport.payment-1.1.8.js';
+      script.onload = () => {
+        console.log('아임포트 SDK 로드 완료');
+        window.IMP.init(process.env.REACT_APP_IMP_KG_INICIS); // SDK 초기화
+      };
+      document.body.appendChild(script);
+
+      return () => document.body.removeChild(script); // 컴포넌트 언마운트 시 스크립트 제거
+    } else {
+      window.IMP.init(process.env.REACT_APP_IMP_KG_INICIS); // 이미 로드된 경우, 바로 초기화
+    }
+  }, []);
+
   const LectureEnrollHandler = async () => {
     if (!currentUser) {
       alert('로그인 후 이용해 주세요.');
@@ -237,7 +254,7 @@ const LectureInfo = () => {
 
         // 서버로 결제 요청 데이터 만들기
         const paymentData = {
-          pg: `${process.env.REACT_APP_PAYMENT_PG}`, // PG사
+          pg: 'html5_inicis', // PG사
           pay_method: 'card', // 결제수단
           merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
           amount: lectureData[0].LecturePrice, // 결제금액
