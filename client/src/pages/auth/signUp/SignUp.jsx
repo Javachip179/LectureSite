@@ -147,13 +147,15 @@ const SignUp = () => {
 
   const validateCellPhone = async () => {
     // 클라이언트 사이드에서의 전화번호 유효성 검사
-    const cellPhoneRegex = /^010[0-9]{8}$/;
+    const cellPhoneRegex = /^010-[0-9]{4}-[0-9]{4}$/;
 
     if (!cellphone) {
       setCellPhoneError('전화번호를 입력해주세요.');
       return false;
     } else if (!cellPhoneRegex.test(cellphone)) {
-      setCellPhoneError('유효한 전화번호 형식을 입력해주세요.');
+      setCellPhoneError(
+        '유효한 전화번호 형식을 입력해주세요. 예) 010-0000-0000'
+      );
       return false;
     } else {
       // 서버 사이드에서의 중복 검사를 위한 API 요청
@@ -162,7 +164,7 @@ const SignUp = () => {
           `${baseUrl}/api/auth/duplication-cellphone`,
           {
             params: {
-              cellphone: cellphone,
+              cellphone: cellphone.replace(/-/g, ''), // 서버로 전송 전 하이픈 제거
             },
             withCredentials: true,
           }
@@ -181,6 +183,7 @@ const SignUp = () => {
       }
     }
   };
+  
 
   const validateNickname = async () => {
     // 클라이언트 사이드에서의 닉네임 형식 검사
@@ -302,7 +305,7 @@ const SignUp = () => {
           <div className='input-container'>
             <input
               type='email'
-              placeholder='이메일'
+              placeholder='allitone@email.com'
               className='signup-input'
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -367,7 +370,7 @@ const SignUp = () => {
           <div className='input-container'>
             <input
               type='tel'
-              placeholder='전화번호'
+              placeholder='010-0000-0000'
               className='signup-input'
               value={cellphone}
               onChange={e => setCellPhone(e.target.value)}

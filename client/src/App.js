@@ -82,7 +82,7 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
-    path: '/watchLecture/:lectureID',
+    path: '/watchLecture/:lectureID/:TOCID',
     element: <WatchLecture />,
   },
 ]);

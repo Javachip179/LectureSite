@@ -21,6 +21,139 @@ const Cart = () => {
   const { lectureID } = useParams();
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = jsCookie.get('userToken');
+        const response = await axios.get(`${baseUrl}/api/cart/cartlist`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCartItems(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error('장바구니 정보를 불러오는 중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const totalAmount = selectedItems.reduce((total, selectedIndex) => {
+    const selectedItem = cartItems[selectedIndex];
+
+    // 만약 선택한 항목이 유효하다면 해당 항목의 LecturePrice를 누적합니다.
+    if (selectedItem && selectedItem.LecturePrice) {
+      return total + selectedItem.LecturePrice;
+    }
+
+    // 그렇지 않으면 누적값을 그대로 반환합니다.
+    return total;
+  }, 0);
+
+  const formattedTotalAmount = totalAmount.toLocaleString();
+
+  const selectedRemoveItem = async index => {
+    try {
+      const lectureIds = selectedItems
+        .map(selectedIndex => cartItems[selectedIndex]?.LectureID)
+        .filter(Boolean);
+      const token = jsCookie.get('userToken');
+      const deletePromises = lectureIds.map(async id => {
+        await axios.post(
+          `${baseUrl}/api/cart/delete-lecture`,
+          {
+            LectureID: id,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      });
+      alert('강의를 삭제했습니다.'); // 여기에 alert 추가
+
+      await Promise.all(deletePromises);
+
+      setSelectedItems(prevSelectedItems =>
+        prevSelectedItems.filter(item => item !== index)
+      );
+
+      const updatedCart = cartItems.filter(
+        (_, i) => !selectedItems.includes(i)
+      );
+      setCartItems(updatedCart);
+      setSelectedItems([]);
+    } catch (error) {
+      console.error('선택한 강의 삭제 중 오류 발생:', error);
+    }
+  };
+
+  const removeItem = async (lectureId, index) => {
+    const token = jsCookie.get('userToken');
+    try {
+      // LectureID 속성이 정의되어 있는지 확인
+      if (lectureId) {
+        // 삭제 요청을 서버에 보냄
+        await axios.post(
+          `${baseUrl}/api/cart/delete-lecture`,
+          {
+            LectureID: lectureId,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // 강의가 성공적으로 삭제된 경우에만 클라이언트 상태 업데이트
+        const updatedCart = cartItems.filter((_, i) => i !== index);
+        setCartItems(updatedCart);
+      } else {
+        console.error('선택한 아이템에 유효한 LectureID가 없습니다.');
+      }
+    } catch (error) {
+      console.error('장바구니 아이템 삭제 중 오류 발생:', error);
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    setSelectedItems(selectAll ? [] : cartItems.map((_, index) => index));
+  };
+
+  const handleCheckboxChange = index => {
+    const isSelected = selectedItems.includes(index);
+
+    // 선택된 항목 배열을 업데이트합니다.
+    const updatedSelectedItems = isSelected
+      ? selectedItems.filter(item => item !== index)
+      : [...selectedItems, index];
+
+    setSelectedItems(updatedSelectedItems);
+
+    // 모든 항목이 선택되었는지 확인하고, 전체 선택 상태를 업데이트합니다.
+    setSelectAll(updatedSelectedItems.length === cartItems.length);
+  };
+
+  const formatCellPhone = cellPhone => {
+    // 전화번호가 정확히 11자리 숫자인 경우에만 형식을 변경합니다.
+    if (cellPhone && cellPhone.length === 11) {
+      return `${cellPhone.substring(0, 3)}-${cellPhone.substring(
+        3,
+        7
+      )}-${cellPhone.substring(7)}`;
+    }
+    // 전화번호가 11자리가 아닌 경우, 원본 전화번호를 그대로 반환합니다.
+    return cellPhone;
+  };
+
+  useEffect(() => {
     if (!window.IMP) {
       // IMP 객체가 없다면 스크립트 로드
       const script = document.createElement('script');
@@ -36,6 +169,8 @@ const Cart = () => {
       window.IMP.init(process.env.REACT_APP_IMP_KG_INICIS); // 이미 로드된 경우, 바로 초기화
     }
   }, []);
+
+  // 일반 결제 또는 수강 신청
   const handleEnrollClick = async () => {
     // 사용자가 로그인하지 않았을 경우, 경고 메시지를 띄우고 함수를 종료합니다.
     if (!currentUser) {
@@ -43,18 +178,15 @@ const Cart = () => {
       return;
     }
 
-    // 강의가 무료인 경우, 바로 수강 신청을 진행합니다.
-    if (lectureData[0].LecturePrice === 0) {
-      handlePaymentSuccess();
-    } else {
-      // 강의가 무료가 아닌 경우, 결제창 모달을 띄웁니다.
-      setIsPaymentModalOpen(true);
+    // 하나 이상의 강의가 선택되지 않았을 경우, 경고 메시지를 띄우고 함수를 종료합니다.
+    if (selectedItems.length === 0) {
+      alert('하나 이상의 강의를 선택해주세요.');
+      return;
     }
-  };
 
-  const handlePaymentSuccess = () => {
-    setIsEnrollment(true); // 수강 등록 상태를 true로 업데이트
-    alert('결제가 성공했습니다.');
+    // 선택된 강의가 있는 경우, 로직을 계속 진행합니다.
+    // 강의가 무료가 아닌 경우, 결제창 모달을 띄웁니다.
+    setIsPaymentModalOpen(true);
   };
 
   const LectureEnrollHandler = async () => {
@@ -194,12 +326,15 @@ const Cart = () => {
     }
   };
 
+  // 카카오 결제
   const handlePayWithKakaoPay = async () => {
-    if (!currentUser) {
-      alert('로그인 후 이용해 주세요.');
-      return;
-    } else {
-      try {
+    try {
+      if (selectedItems.length > 0) {
+        const lectureIds = selectedItems.map(selectedIndex => {
+          const selectedLecture = cartItems[selectedIndex];
+          return selectedLecture.LectureID;
+        });
+
         const token = jsCookie.get('userToken');
 
         // 서버로 결제 요청 데이터 만들기
@@ -207,13 +342,18 @@ const Cart = () => {
           pg: 'kakaopay', // PG사
           pay_method: 'card', // 결제수단
           merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-          amount: lectureData[0].LecturePrice, // 결제금액
-          name: lectureData[0].Title, // 주문명
+          amount: lectureIds.reduce((total, lectureId) => {
+            const selectedLecture = cartItems.find(
+              item => item.LectureID === lectureId
+            );
+            return total + (selectedLecture ? selectedLecture.LecturePrice : 0);
+          }, 0), // 선택한 강의들의 총 결제금액
+          name: '강의 결제', // 주문명
           buyer_name: currentUser.UserName, // 구매자 이름
           buyer_email: currentUser.UserEmail, // 구매자 이메일
         };
 
-        // console.log("paymentData", paymentData);
+        console.log('paymentData', paymentData);
 
         // IMP SDK 초기화
         const { IMP } = window;
@@ -222,9 +362,9 @@ const Cart = () => {
         // 결제 요청
         IMP.request_pay(paymentData, async response => {
           const { success, error_msg } = response;
-          // console.log("imp_uid1", response.imp_uid);
-          // console.log("merchant_uid1", response.merchant_uid);
-          // console.log("payment_amount1", response.paid_amount);
+          console.log('imp_uid1', response.imp_uid);
+          console.log('merchant_uid1', response.merchant_uid);
+          console.log('payment_amount1', response.paid_amount);
           const imp_uid = response.imp_uid;
           const merchant_uid = response.merchant_uid;
           const payment_amount = response.paid_amount;
@@ -243,66 +383,79 @@ const Cart = () => {
                 }
               );
 
-              // console.log(
-              //   "verificationResponse.data",
-              //   verificationResponse.data
-              // );
+              console.log(
+                'verificationResponse.data',
+                verificationResponse.data
+              );
               const cardName = verificationResponse.data.cardName;
-              // console.log("cardName", cardName);
+              console.log('cardName', cardName);
               if (verificationResponse.data.success) {
-                console.log(`결제에 사용된 카드: ${cardName}`);
                 // 서버로 수강 등록 요청
-                const enrollmentResponse = await axios.post(
-                  `${baseUrl}/api/enrollment`,
-                  { lectureId: lectureID },
-                  {
-                    withCredentials: true,
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
+                const enrollmentResponse = await Promise.all(
+                  lectureIds.map(async lectureId => {
+                    return axios.post(
+                      `${baseUrl}/api/enrollment`,
+                      { lectureId: lectureId },
+                      {
+                        withCredentials: true,
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                  })
                 );
 
-                const paymentResponse = await axios.post(
-                  `${baseUrl}/api/modify/kakao`,
-                  {
-                    lectureId: lectureID,
-                    cardName: cardName,
-                  },
-                  {
-                    withCredentials: true,
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
+                const paymentResponse = await Promise.all(
+                  lectureIds.map(async lectureId => {
+                    return axios.post(
+                      `${baseUrl}/api/modify/kakao`,
+                      { lectureId: lectureId, cardName: cardName },
+                      {
+                        withCredentials: true,
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                  })
                 );
 
-                const cartResponse = await axios.post(
-                  `${baseUrl}/api/cart/delete-lecture`,
-                  { lectureId: lectureID },
-                  {
-                    withCredentials: true,
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
+                const cartResponse = await Promise.all(
+                  lectureIds.map(async lectureId => {
+                    return axios.post(
+                      `${baseUrl}/api/cart/delete-lecture`,
+                      { lectureId: lectureId },
+                      {
+                        withCredentials: true,
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                  })
                 );
+
                 console.log(
                   'enrollmentResponse.data.success?',
-                  enrollmentResponse.data
+                  enrollmentResponse.map(res => res.data)
                 );
                 console.log(
                   'paymentResponse.data.success?',
-                  paymentResponse.data
+                  paymentResponse.map(res => res.data)
                 );
-                console.log('cartResponse.data', cartResponse.data);
+                console.log(
+                  'cartResponse.data',
+                  cartResponse.map(res => res.data)
+                );
 
-                // 수강 등록이 성공한 경우
+                // 모든 수강 등록이 성공한 경우
                 if (
-                  enrollmentResponse.data ===
-                    '강의 수강 신청이 완료되었습니다.' &&
-                  paymentResponse.data.success &&
-                  cartResponse.data === '삭제 성공'
+                  enrollmentResponse.every(
+                    res => res.data === '강의 수강 신청이 완료되었습니다.'
+                  ) &&
+                  paymentResponse.every(res => res.data.success) &&
+                  cartResponse.every(res => res.data === '삭제 성공')
                 ) {
                   alert('수강 등록 및 결제가 성공했습니다.');
 
@@ -327,14 +480,19 @@ const Cart = () => {
             return;
           }
         });
-      } catch (error) {
-        console.error('API 호출 중 오류:', error);
-        alert('결제 요청 중 오류가 발생했습니다.');
+      } else {
+        console.error('하나 이상의 강의를 선택해야 합니다.');
+        alert('하나 이상의 강의를 선택해야 합니다.');
         return;
       }
+    } catch (error) {
+      console.error('결제 처리 중 오류 발생:', error);
+      alert('결제 처리 중 오류가 발생했습니다.');
+      return;
     }
   };
 
+  // 토스 결제
   const handlePayWithTossPay = async () => {
     if (!currentUser) {
       alert('로그인 후 이용해 주세요.');
@@ -472,123 +630,6 @@ const Cart = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = jsCookie.get('userToken');
-        const response = await axios.get(`${baseUrl}/api/cart/cartlist`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setCartItems(response.data);
-        console.log(cartItems);
-      } catch (error) {
-        console.error('장바구니 정보를 불러오는 중 오류 발생:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const totalAmount = selectedItems.reduce((total, selectedIndex) => {
-    const selectedItem = cartItems[selectedIndex];
-
-    // 만약 선택한 항목이 유효하다면 해당 항목의 LecturePrice를 누적합니다.
-    if (selectedItem && selectedItem.LecturePrice) {
-      return total + selectedItem.LecturePrice;
-    }
-
-    // 그렇지 않으면 누적값을 그대로 반환합니다.
-    return total;
-  }, 0);
-
-  const formattedTotalAmount = totalAmount.toLocaleString();
-
-  const selectedRemoveItem = async index => {
-    try {
-      const lectureIds = selectedItems
-        .map(selectedIndex => cartItems[selectedIndex]?.LectureID)
-        .filter(Boolean);
-      const token = jsCookie.get('userToken');
-      const deletePromises = lectureIds.map(async id => {
-        await axios.post(
-          `${baseUrl}/api/cart/delete-lecture`,
-          {
-            LectureID: id,
-          },
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      });
-      alert('강의를 삭제했습니다.'); // 여기에 alert 추가
-
-      await Promise.all(deletePromises);
-
-      setSelectedItems(prevSelectedItems =>
-        prevSelectedItems.filter(item => item !== index)
-      );
-
-      const updatedCart = cartItems.filter(
-        (_, i) => !selectedItems.includes(i)
-      );
-      setCartItems(updatedCart);
-      setSelectedItems([]);
-    } catch (error) {
-      console.error('선택한 강의 삭제 중 오류 발생:', error);
-    }
-  };
-
-  const removeItem = async (lectureId, index) => {
-    try {
-      // LectureID 속성이 정의되어 있는지 확인
-      if (lectureId) {
-        // 삭제 요청을 서버에 보냄
-        await axios.post(
-          `${baseUrl}/api/cart/delete-lecture`,
-          {
-            LectureID: lectureId,
-          },
-          {
-            withCredentials: true,
-          }
-        );
-
-        // 강의가 성공적으로 삭제된 경우에만 클라이언트 상태 업데이트
-        const updatedCart = cartItems.filter((_, i) => i !== index);
-        setCartItems(updatedCart);
-      } else {
-        console.error('선택한 아이템에 유효한 LectureID가 없습니다.');
-      }
-    } catch (error) {
-      console.error('장바구니 아이템 삭제 중 오류 발생:', error);
-    }
-  };
-
-  const handleSelectAll = () => {
-    setSelectAll(!selectAll);
-    setSelectedItems(selectAll ? [] : cartItems.map((_, index) => index));
-  };
-
-  const handleCheckboxChange = index => {
-    const isSelected = selectedItems.includes(index);
-
-    // 선택된 항목 배열을 업데이트합니다.
-    const updatedSelectedItems = isSelected
-      ? selectedItems.filter(item => item !== index)
-      : [...selectedItems, index];
-
-    setSelectedItems(updatedSelectedItems);
-
-    // 모든 항목이 선택되었는지 확인하고, 전체 선택 상태를 업데이트합니다.
-    setSelectAll(updatedSelectedItems.length === cartItems.length);
-  };
-
   return (
     <div className='cart'>
       <div className='title-container'>
@@ -680,19 +721,19 @@ const Cart = () => {
                 <div className='user-detail'>
                   <p className='label'>이름:</p>
                   <p className='value'>
-                    {cartItems[0]?.UserName || '이름 없음'}
+                    {currentUser?.UserName || '이름 없음'}
                   </p>
                 </div>
                 <div className='user-detail'>
                   <p className='label'>이메일:</p>
                   <p className='value'>
-                    {cartItems[0]?.UserEmail || '이메일 없음'}
+                    {currentUser?.UserEmail || '이메일 없음'}
                   </p>
                 </div>
                 <div className='user-detail'>
                   <p className='label'>휴대폰 번호:</p>
                   <p className='value'>
-                    {cartItems[0]?.UserCellPhone || '번호 없음'}
+                    {formatCellPhone(currentUser?.UserCellPhone) || '번호 없음'}
                   </p>
                 </div>
               </div>

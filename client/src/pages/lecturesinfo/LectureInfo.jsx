@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './style.scss';
 import axios from 'axios';
 import { baseUrl } from '../../config/baseUrl.js';
@@ -54,6 +54,15 @@ const LectureInfo = () => {
   const [selectedItem, setSelectedItem] = useState('강의소개');
   const [menuStates, setMenuStates] = useState({});
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const location = useLocation();
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    // 페이지 로드 시 네비게이션 상태를 확인하여 스크롤 조정
+    if (location.state?.scrollToTop) {
+      window.scrollTo(0, 0);
+    }
+  }, [location]);
 
   const [ratingPercentages, setRatingPercentages] = useState({
     1: 0,
@@ -115,7 +124,7 @@ const LectureInfo = () => {
         setTocData(response.data.toc);
         setCategoryData(response.data.categories);
         setCommentData(response.data.comments);
-        console.log('questions Data:', response.data.lecture);
+        console.log('questions Data:', response.data.toc);
       } catch (error) {
         console.error('강의 정보를 불러오는 중 오류 발생:', error);
       }
@@ -219,11 +228,16 @@ const LectureInfo = () => {
 
   const averageRating = calculateAverageRating();
 
-  const watchLectureHandler = lectureID => {
+  const watchLectureHandler = (lectureID, TOCID) => {
+    // console.log("123ww", lectureID, TOCID);
     if (!currentUser) {
       alert('로그인 후 이용해 주세요.');
+      return;
+    } else if (!isEnrollment) {
+      alert('수강 후 강의를 시청할 수 있습니다.');
+      return;
     } else {
-      navigate(`/watchlecture/${lectureID}`);
+      navigate(`/watchlecture/${lectureID}/${TOCID}`);
     }
   };
 
@@ -246,22 +260,48 @@ const LectureInfo = () => {
 
   const handlePaymentSuccess = () => {
     setIsEnrollment(true); // 수강 등록 상태를 true로 업데이트
-    alert('수강 등록 및 결제가 성공했습니다.');
+    alert('수강 등록이 성공했습니다.');
   };
   // console.log("isInCart:", isInCart);
   // console.log("isEnrollment", isEnrollment);
 
   // 수강하기 버튼 클릭 이벤트 핸들러
   const handleEnrollClick = async () => {
+    const token = jsCookie.get('userToken');
     // 사용자가 로그인하지 않았을 경우, 경고 메시지를 띄우고 함수를 종료합니다.
     if (!currentUser) {
       alert('로그인 후 이용해 주세요.');
       return;
     }
 
-    // 강의가 무료인 경우, 바로 수강 신청을 진행합니다.
-    if (lectureData[0].LecturePrice === 0) {
-      handlePaymentSuccess();
+    // 강의가 무료인 경우
+    if (lectureData[0]?.LecturePrice === 0) {
+      try {
+        // 서버로 수강 등록 요청을 보냅니다. 예제에서는 axios를 사용했습니다.
+        const enrollmentResponse = await axios.post(
+          `${baseUrl}/api/enrollment`,
+          { lectureId: lectureID },
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log('enrollmentResponse??', enrollmentResponse);
+
+        // 응답에 따른 처리
+        if (enrollmentResponse.data === '강의 수강 신청이 완료되었습니다.') {
+          // 수강 등록 성공 처리
+          handlePaymentSuccess();
+        } else {
+          // 서버 측에서 수강 등록 실패 응답을 준 경우
+          alert('수강 등록에 실패했습니다.');
+        }
+      } catch (error) {
+        console.error('수강 등록 중 오류 발생:', error);
+        alert('수강 등록 중 문제가 발생했습니다.');
+      }
     } else {
       // 강의가 무료가 아닌 경우, 결제창 모달을 띄웁니다.
       setIsPaymentModalOpen(true);
@@ -751,6 +791,29 @@ const LectureInfo = () => {
     return commentData ? commentData.length : 0;
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const stickyOffsetTop = 200; // 고정 상단 위치
+      const stickyOffsetBottom = document.documentElement.offsetHeight - 500; // 여기서는 예시로 문서의 높이에서 500px을 뺀 위치를 사용합니다.
+
+      const offset = window.pageYOffset;
+
+      if (offset > stickyOffsetTop && offset < stickyOffsetBottom) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    // 스크롤 이벤트 리스너 등록
+    window.addEventListener('scroll', handleScroll);
+
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
     <div className='lecture'>
       <div className='lecture-container'>
@@ -769,7 +832,9 @@ const LectureInfo = () => {
                 {categoryData &&
                   Object.keys(categoryData).map(key => (
                     <div key={key}>
-                      <span>카테고리 : {categoryData[key].CategoryName}</span>
+                      <span>
+                        카테고리 {'>'} {categoryData[key].CategoryName}
+                      </span>
                     </div>
                   ))}
               </div>
@@ -799,14 +864,22 @@ const LectureInfo = () => {
               </div>
 
               <div className='lecture-subcategory'>
-                {categoryData &&
-                  Object.keys(categoryData).map(key => (
-                    <div key={key}>
-                      {categoryData[key].SubcategoryName && (
-                        <span>#{categoryData[key].SubcategoryName}</span>
-                      )}
-                    </div>
-                  ))}
+                {Object.entries(categoryData).map(([key, value]) => (
+                  <div key={key} className='subcategory-block'>
+                    {value.Subcategories &&
+                    typeof value.Subcategories === 'string' ? (
+                      value.Subcategories.split(', ').map(
+                        (subcategory, index) => (
+                          <div key={index} className='subcategory-item'>
+                            #{subcategory.trim()}
+                          </div>
+                        )
+                      )
+                    ) : (
+                      <span>서브카테고리 정보 없음</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -926,9 +999,9 @@ const LectureInfo = () => {
                               onClick={() => toggleMenu(menu.TOCID)}
                             >
                               {menuStates[`menu${menu.TOCID}Open`] ? (
-                                <GoChevronUp />
-                              ) : (
                                 <GoChevronDown />
+                              ) : (
+                                <GoChevronUp />
                               )}
                               <span className='menu-title'>{menu.Title}</span>
                             </div>
@@ -940,7 +1013,15 @@ const LectureInfo = () => {
                                       subMenu.ParentTOCID === menu.TOCID
                                   )
                                   .map(subMenu => (
-                                    <li key={subMenu.TOCID}>
+                                    <li
+                                      key={subMenu.TOCID}
+                                      onClick={() =>
+                                        watchLectureHandler(
+                                          lectureID,
+                                          subMenu.TOCID
+                                        )
+                                      }
+                                    >
                                       <FaRegCirclePlay />
                                       {subMenu.Title}
                                     </li>
@@ -1045,7 +1126,7 @@ const LectureInfo = () => {
           </div>
         </div>
 
-        <div className='right-wrapper'>
+        <div className={isSticky ? 'right-wrapper sticky' : 'right-wrapper'}>
           <div className='right-wrapper-container'>
             <div className='lecture-button-card'>
               <div className='lecture-button-top'>
@@ -1056,7 +1137,9 @@ const LectureInfo = () => {
                 </div>
                 {isEnrollment ? (
                   <button
-                    onClick={() => watchLectureHandler(lectureID)}
+                    onClick={() =>
+                      watchLectureHandler(lectureID, tocData[1].TOCID)
+                    }
                     className='lecture-paid'
                   >
                     이어서 학습하기

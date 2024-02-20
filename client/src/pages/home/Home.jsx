@@ -94,7 +94,8 @@ const Home = () => {
   }, []);
 
   const handleSubmit = lectureID => {
-    nav(`/lecturesinfo/${lectureID}`);
+    // 페이지 이동 시 스크롤을 최상단으로 이동시키기 위한 상태 전달
+    nav(`/lecturesinfo/${lectureID}`, { state: { scrollToTop: true } });
   };
 
   return (

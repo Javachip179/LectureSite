@@ -53,9 +53,9 @@ router.get('/:lectureId', (req, res) => {
       `;
 
       const categoryQuery = `
-      SELECT DISTINCT
+      SELECT
       c.CategoryName,
-      sc.SubcategoryName
+      GROUP_CONCAT(sc.SubcategoryName ORDER BY sc.SubcategoryName SEPARATOR ', ') AS Subcategories
     FROM
       Lectures l
     JOIN
@@ -65,7 +65,9 @@ router.get('/:lectureId', (req, res) => {
     LEFT JOIN
       Subcategory sc ON lc.SubcategoryID = sc.SubcategoryID
     WHERE
-      l.LectureID = ${lectureId};
+      l.LectureID = ${lectureId}
+    GROUP BY
+      c.CategoryName;    
       `;
 
       const commentQuery = `
@@ -376,6 +378,7 @@ router.get('/:lectureId/watch', (req, res) => {
   const lectureId = req.params.lectureId;
   const userId = verifyTokenAndGetUserId(req, res);
 
+  console.log(userId, lectureId);
   mysql.getConnection((error, conn) => {
     if (error) {
       console.log(error);
@@ -389,7 +392,7 @@ router.get('/:lectureId/watch', (req, res) => {
         lt.*,
         e.AttendanceRate,
         u.UserID ,
-        l.LectureTitle 
+        l.Title 
       FROM 
         LecturesMaterial lm 
       JOIN
@@ -405,12 +408,133 @@ router.get('/:lectureId/watch', (req, res) => {
     `;
 
     conn.query(query, [lectureId], (error, results) => {
+      // console.log("results", results);
       if (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
       } else {
         res.json(results);
-        console.log(results);
+        // console.log(results);
+      }
+
+      // 여기에서 응답을 보내고 난 후에 연결을 종료해야 합니다.
+      conn.release();
+    });
+  });
+});
+
+router.post('/tocInfoSet', (req, res) => {
+  const userId = verifyTokenAndGetUserId(req, res);
+  const tocId = req.body.TOCID;
+  const progress = req.body.Progress;
+  const lectureId = req.body.LectureID;
+
+  console.log(userId, tocId, progress, lectureId);
+
+  // 사용자 ID와 TOC ID를 사용하여 데이터베이스에서 진행 정보를 가져온다.
+  // 데이터베이스에서 진행 정보 조회
+  const sqlSelect = `SELECT * FROM VideoProgress WHERE UserID = ? AND TOCID = ?;`;
+  const valuesSelect = [userId, tocId];
+
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('내부 서버 오류');
+      return;
+    }
+
+    // 진행 정보를 선택한다.
+    conn.query(sqlSelect, valuesSelect, (err, selectResult) => {
+      console.log('selectResult', selectResult);
+      if (err) {
+        console.error(err);
+        return res.status(500).send('내부 서버 오류');
+      }
+
+      if (selectResult.length === 0) {
+        // 선택된 결과가 없으면 새로운 레코드를 삽입한다.
+        const sqlInsert = `INSERT INTO VideoProgress (UserID, TOCID, Progress, LastAccessed, LectureID)
+      VALUE (?,?,?,NOW(),?);`;
+        const valuesInsert = [userId, tocId, progress, lectureId];
+        conn.query(sqlInsert, valuesInsert, (err, insertResult) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send('내부 서버 오류');
+          }
+          if (insertResult.length === 0) {
+            res.json({
+              success: false,
+              message: '실패',
+            });
+          } else {
+            res.json({
+              success: true,
+              message: '성공',
+            });
+          }
+        });
+      } else if (selectResult[0].Progress < progress) {
+        // 현재 진행률이 더 높으면 업데이트한다.
+        const sqlUpdate = `UPDATE VideoProgress SET Progress = ?, LastAccessed = NOW() WHERE UserID = ? AND TOCID = ?;`;
+        const valuesUpdate = [progress, userId, tocId];
+        conn.query(sqlUpdate, valuesUpdate, (err, updateResult) => {
+          if (err) {
+            console.error(err);
+            return res.status(500).send('내부 서버 오류');
+          }
+          if (updateResult.affectedRows === 0) {
+            res.json({
+              success: false,
+              message: '업데이트 실패',
+            });
+          } else {
+            res.json({
+              success: true,
+              message: '업데이트 성공',
+            });
+          }
+        });
+      } else {
+        // 현재 진행률이 더 낮으면 무시한다.
+        res.json({
+          success: false,
+          message: '이미 더 높은 진행률이 저장되어 있습니다.',
+        });
+      }
+    });
+  });
+});
+
+//해당 강의의 TOCID 추출
+router.get('/:lectureID/toc', (req, res) => {
+  const { lectureID } = req.params;
+  console.log('lectureID??', lectureID);
+
+  mysql.getConnection((error, conn) => {
+    if (error) {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+
+    const query = `
+      SELECT 
+        lt.TOCID 
+      FROM 
+        Lectures l 
+      JOIN
+        LectureTOC lt ON lt.LectureID = l.LectureID 
+      WHERE 
+        l.LectureID = ${lectureID};
+    `;
+
+    conn.query(query, [lectureID], (error, results) => {
+      // console.log("results", results);
+      if (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      } else {
+        res.json(results);
       }
 
       // 여기에서 응답을 보내고 난 후에 연결을 종료해야 합니다.

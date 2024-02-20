@@ -95,7 +95,7 @@ router.get('/cartlist', (req, res) => {
 
 //장바구니 삭제
 router.post('/delete-lecture', async (req, res) => {
-  const lectureId = req.body.LectureID;
+  const lectureId = req.body.lectureId;
   const userId = verifyTokenAndGetUserId(req, res);
   // console.log("lectureId111:  ",lectureId)
 

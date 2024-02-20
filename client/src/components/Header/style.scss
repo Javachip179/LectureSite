@@ -379,10 +379,10 @@
   padding: 5px; // 테두리와 아이콘 사이의 공간
   margin-right: 10px; // 다른 요소와의 간격
   transition: background-color 0.3s, transform 0.3s; // 배경색과 변형에 대한 부드러운 전환 효과
-  background-color: #525463;
+  background-color: #5094fa;
 
   &:hover {
-    background-color: #525463; // 호버 시 배경색 변경
+    background-color: #5094fa; // 호버 시 배경색 변경
   }
 
   svg {

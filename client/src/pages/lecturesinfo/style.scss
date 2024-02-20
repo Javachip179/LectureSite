@@ -1,3 +1,8 @@
+.section {
+  padding-top: 70px; /* 고정된 헤더의 높이에 따라 조정 */
+  margin-top: -70px; /* 고정된 헤더의 높이에 따라 조정 */
+}
+
 ul, ol, li{list-style: none;}
 
 .lecture{
@@ -43,6 +48,11 @@ ul, ol, li{list-style: none;}
     }
 
     .lecture-category{
+      line-height: 1.43;
+    letter-spacing: -.3px;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 500;
       margin-top: 20px;
     }
     
@@ -91,16 +101,35 @@ ul, ol, li{list-style: none;}
       }
     }
 
-    .lecture-subcategory{
-    line-height: 1.5;
-    letter-spacing: -.3px;
-    font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 100px;
-    background-color: #173f51;
-    color: #fff;
-    font-weight: 500;
+    .lecture-subcategory {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px; /* 각 태그 사이의 간격 */
     }
+    
+    .subcategory-block {
+      /* 서브카테고리 블록 스타일링 (필요하다면) */
+    }
+    
+    .subcategory-item {
+      display: inline-block;
+      margin-left: 0;
+      margin-right: 4px;
+      padding: 8px 12px; /* 원하는 패딩으로 조절 */
+      background-color: #173f51;
+      color: white; /* 글자 색상 */
+      border-radius: 10px; /* 버튼 모서리를 둥글게 */
+      font-size: 10px; /* 글자 크기 */
+      cursor: pointer; /* 마우스 오버시 포인터 모양으로 변경 */
+      text-decoration: none; /* 밑줄 제거 */
+    }
+    
+    .subcategory-item:hover {
+      background-color: #173f51;
+    }
+    
+
+    
     
     /* Styles for the lecture price */
     .lecture-price {
@@ -165,6 +194,7 @@ ul, ol, li{list-style: none;}
         transition: background-color 0.3s; /* 배경색 변경에 대한 트랜지션 적용 */
         text-align: center; /* 텍스트 중앙 정렬 */
         position: relative;
+        
         
         &.active {
           color: #1b1c1d;
@@ -417,6 +447,7 @@ ul, ol, li{list-style: none;}
                 font-size: 15px;
                 color: #495057;
                 align-items: center;
+                cursor: pointer;
 
                 svg {
                   margin-right: 10px;
@@ -604,12 +635,17 @@ ul, ol, li{list-style: none;}
       }
     }
   }
-    
+
     .right-wrapper {
       position: relative;
       padding-right: 0;
       flex-basis: 34.333333%;
       max-width: 34.333333%;
+
+      .sticky {
+        position: sticky;
+        top: 0; /* 상단 고정 위치 */
+      }
     
       .right-wrapper-container{
         margin: 0 34px 20px auto;
