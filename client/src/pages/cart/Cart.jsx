@@ -1,15 +1,476 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import jsCookie from 'js-cookie';
 import { baseUrl } from '../../config/baseUrl';
 import DefaultImage from '../../img/defaultProfileImage.png';
+import { AuthContext } from '../../context/authContext';
+import { useParams, useNavigate } from 'react-router-dom';
 import './style.scss';
 // import { useLocation } from "react-router-dom";
+
+import PaymentModal from '../mypage/payment/paymentmodal/PaymentModal';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+  const [lectureData, setLectureData] = useState({});
+  const [isEnrollment, setIsEnrollment] = useState(false);
+  const { lectureID } = useParams();
+
+  useEffect(() => {
+    if (!window.IMP) {
+      // IMP 객체가 없다면 스크립트 로드
+      const script = document.createElement('script');
+      script.src = 'https://cdn.iamport.kr/js/iamport.payment-1.1.8.js';
+      script.onload = () => {
+        console.log('아임포트 SDK 로드 완료');
+        window.IMP.init(process.env.REACT_APP_IMP_KG_INICIS); // SDK 초기화
+      };
+      document.body.appendChild(script);
+
+      return () => document.body.removeChild(script); // 컴포넌트 언마운트 시 스크립트 제거
+    } else {
+      window.IMP.init(process.env.REACT_APP_IMP_KG_INICIS); // 이미 로드된 경우, 바로 초기화
+    }
+  }, []);
+  const handleEnrollClick = async () => {
+    // 사용자가 로그인하지 않았을 경우, 경고 메시지를 띄우고 함수를 종료합니다.
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+      return;
+    }
+
+    // 강의가 무료인 경우, 바로 수강 신청을 진행합니다.
+    if (lectureData[0].LecturePrice === 0) {
+      handlePaymentSuccess();
+    } else {
+      // 강의가 무료가 아닌 경우, 결제창 모달을 띄웁니다.
+      setIsPaymentModalOpen(true);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setIsEnrollment(true); // 수강 등록 상태를 true로 업데이트
+    alert('결제가 성공했습니다.');
+  };
+
+  const LectureEnrollHandler = async () => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+      return;
+    } else {
+      try {
+        const token = jsCookie.get('userToken');
+
+        // 서버로 결제 요청 데이터 만들기
+        const paymentData = {
+          pg: 'html5_inicis', // PG사
+          pay_method: 'card', // 결제수단
+          merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+          amount: lectureData[0].LecturePrice, // 결제금액
+          name: lectureData[0].Title, // 주문명
+          buyer_name: currentUser.UserName, // 구매자 이름
+          buyer_email: currentUser.UserEmail, // 구매자 이메일
+        };
+
+        // console.log("paymentData", paymentData);
+
+        // IMP SDK 초기화
+        const { IMP } = window;
+        IMP.init(`${process.env.REACT_APP_IMP_KG_INICIS}`);
+
+        // 결제 요청
+        IMP.request_pay(paymentData, async response => {
+          const { success, error_msg } = response;
+          // console.log("imp_uid1", response.imp_uid);
+          // console.log("merchant_uid1", response.merchant_uid);
+          // console.log("payment_amount1", response.paid_amount);
+          const imp_uid = response.imp_uid;
+          const merchant_uid = response.merchant_uid;
+          const payment_amount = response.paid_amount;
+          if (success) {
+            try {
+              // 결제 검증을 위한 서버 요청
+              const verificationResponse = await axios.post(
+                `${baseUrl}/api/modify/payment-verify`,
+                {
+                  imp_uid: imp_uid,
+                  merchant_uid: merchant_uid,
+                  payment_amount: payment_amount,
+                },
+                {
+                  withCredentials: true,
+                }
+              );
+
+              // console.log(
+              //   "verificationResponse.data",
+              //   verificationResponse.data
+              // );
+              const cardName = verificationResponse.data.cardName;
+              // console.log("cardName", cardName);
+              if (verificationResponse.data.success) {
+                // 서버로 수강 등록 요청
+                const enrollmentResponse = await axios.post(
+                  `${baseUrl}/api/enrollment`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const paymentResponse = await axios.post(
+                  `${baseUrl}/api/modify`,
+                  { lectureId: lectureID, cardName: cardName },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const cartResponse = await axios.post(
+                  `${baseUrl}/api/cart/delete-lecture`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                console.log(
+                  'enrollmentResponse.data.success?',
+                  enrollmentResponse.data
+                );
+                console.log(
+                  'paymentResponse.data.success?',
+                  paymentResponse.data
+                );
+                console.log('cartResponse.data', cartResponse.data);
+
+                // 수강 등록이 성공한 경우
+                if (
+                  enrollmentResponse.data ===
+                    '강의 수강 신청이 완료되었습니다.' &&
+                  paymentResponse.data.success &&
+                  cartResponse.data === '삭제 성공'
+                ) {
+                  alert('수강 등록 및 결제가 성공했습니다.');
+
+                  window.location.reload();
+                } else {
+                  // 수강 등록이 실패한 경우에 대한 처리
+                  alert('수강 등록에 실패했습니다.');
+                  return;
+                }
+              } else {
+                // 결제 검증 실패
+                alert('결제 검증에 실패했습니다.');
+                return;
+              }
+            } catch (error) {
+              console.error('API 호출 중 오류:', error);
+              alert('결제 요청 중 오류가 발생했습니다.');
+              return;
+            }
+          } else {
+            alert(`결제 실패: ${error_msg}`);
+            return;
+          }
+        });
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+        alert('결제 요청 중 오류가 발생했습니다.');
+        return;
+      }
+    }
+  };
+
+  const handlePayWithKakaoPay = async () => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+      return;
+    } else {
+      try {
+        const token = jsCookie.get('userToken');
+
+        // 서버로 결제 요청 데이터 만들기
+        const paymentData = {
+          pg: 'kakaopay', // PG사
+          pay_method: 'card', // 결제수단
+          merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+          amount: lectureData[0].LecturePrice, // 결제금액
+          name: lectureData[0].Title, // 주문명
+          buyer_name: currentUser.UserName, // 구매자 이름
+          buyer_email: currentUser.UserEmail, // 구매자 이메일
+        };
+
+        // console.log("paymentData", paymentData);
+
+        // IMP SDK 초기화
+        const { IMP } = window;
+        IMP.init(`${process.env.REACT_APP_IMP_KG_INICIS}`);
+
+        // 결제 요청
+        IMP.request_pay(paymentData, async response => {
+          const { success, error_msg } = response;
+          // console.log("imp_uid1", response.imp_uid);
+          // console.log("merchant_uid1", response.merchant_uid);
+          // console.log("payment_amount1", response.paid_amount);
+          const imp_uid = response.imp_uid;
+          const merchant_uid = response.merchant_uid;
+          const payment_amount = response.paid_amount;
+          if (success) {
+            try {
+              // 결제 검증을 위한 서버 요청
+              const verificationResponse = await axios.post(
+                `${baseUrl}/api/modify/payment-verify`,
+                {
+                  imp_uid: imp_uid,
+                  merchant_uid: merchant_uid,
+                  payment_amount: payment_amount,
+                },
+                {
+                  withCredentials: true,
+                }
+              );
+
+              // console.log(
+              //   "verificationResponse.data",
+              //   verificationResponse.data
+              // );
+              const cardName = verificationResponse.data.cardName;
+              // console.log("cardName", cardName);
+              if (verificationResponse.data.success) {
+                console.log(`결제에 사용된 카드: ${cardName}`);
+                // 서버로 수강 등록 요청
+                const enrollmentResponse = await axios.post(
+                  `${baseUrl}/api/enrollment`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const paymentResponse = await axios.post(
+                  `${baseUrl}/api/modify/kakao`,
+                  {
+                    lectureId: lectureID,
+                    cardName: cardName,
+                  },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const cartResponse = await axios.post(
+                  `${baseUrl}/api/cart/delete-lecture`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                console.log(
+                  'enrollmentResponse.data.success?',
+                  enrollmentResponse.data
+                );
+                console.log(
+                  'paymentResponse.data.success?',
+                  paymentResponse.data
+                );
+                console.log('cartResponse.data', cartResponse.data);
+
+                // 수강 등록이 성공한 경우
+                if (
+                  enrollmentResponse.data ===
+                    '강의 수강 신청이 완료되었습니다.' &&
+                  paymentResponse.data.success &&
+                  cartResponse.data === '삭제 성공'
+                ) {
+                  alert('수강 등록 및 결제가 성공했습니다.');
+
+                  window.location.reload();
+                } else {
+                  // 수강 등록이 실패한 경우에 대한 처리
+                  alert('수강 등록에 실패했습니다.');
+                  return;
+                }
+              } else {
+                // 결제 검증 실패
+                alert('결제 검증에 실패했습니다.');
+                return;
+              }
+            } catch (error) {
+              console.error('API 호출 중 오류:', error);
+              alert('결제 요청 중 오류가 발생했습니다.');
+              return;
+            }
+          } else {
+            alert(`결제 실패: ${error_msg}`);
+            return;
+          }
+        });
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+        alert('결제 요청 중 오류가 발생했습니다.');
+        return;
+      }
+    }
+  };
+
+  const handlePayWithTossPay = async () => {
+    if (!currentUser) {
+      alert('로그인 후 이용해 주세요.');
+      return;
+    } else {
+      try {
+        const token = jsCookie.get('userToken');
+
+        // 서버로 결제 요청 데이터 만들기
+        const paymentData = {
+          pg: 'toss', // PG사
+          pay_method: 'card', // 결제수단
+          merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+          amount: lectureData[0].LecturePrice, // 결제금액
+          name: lectureData[0].Title, // 주문명
+          buyer_name: currentUser.UserName, // 구매자 이름
+          buyer_email: currentUser.UserEmail, // 구매자 이메일
+        };
+
+        // console.log("paymentData", paymentData);
+
+        // IMP SDK 초기화
+        const { IMP } = window;
+        IMP.init(`${process.env.REACT_APP_IMP_KG_INICIS}`);
+
+        // 결제 요청
+        IMP.request_pay(paymentData, async response => {
+          const { success, error_msg } = response;
+          // console.log("imp_uid1", response.imp_uid);
+          // console.log("merchant_uid1", response.merchant_uid);
+          // console.log("payment_amount1", response.paid_amount);
+          const imp_uid = response.imp_uid;
+          const merchant_uid = response.merchant_uid;
+          const payment_amount = response.paid_amount;
+          if (success) {
+            try {
+              // 결제 검증을 위한 서버 요청
+              const verificationResponse = await axios.post(
+                `${baseUrl}/api/modify/payment-verify`,
+                {
+                  imp_uid: imp_uid,
+                  merchant_uid: merchant_uid,
+                  payment_amount: payment_amount,
+                },
+                {
+                  withCredentials: true,
+                }
+              );
+
+              // console.log(
+              //   "verificationResponse.data",
+              //   verificationResponse.data
+              // );
+              const cardName = verificationResponse.data.cardName;
+              // console.log("cardName", cardName);
+              if (verificationResponse.data.success) {
+                // 서버로 수강 등록 요청
+                const enrollmentResponse = await axios.post(
+                  `${baseUrl}/api/enrollment`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const paymentResponse = await axios.post(
+                  `${baseUrl}/api/modify`,
+                  { lectureId: lectureID, cardName: cardName },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                const cartResponse = await axios.post(
+                  `${baseUrl}/api/cart/delete-lecture`,
+                  { lectureId: lectureID },
+                  {
+                    withCredentials: true,
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+                console.log(
+                  'enrollmentResponse.data.success?',
+                  enrollmentResponse.data
+                );
+                console.log(
+                  'paymentResponse.data.success?',
+                  paymentResponse.data
+                );
+                console.log('cartResponse.data', cartResponse.data);
+
+                // 수강 등록이 성공한 경우
+                if (
+                  enrollmentResponse.data ===
+                    '강의 수강 신청이 완료되었습니다.' &&
+                  paymentResponse.data.success &&
+                  cartResponse.data === '삭제 성공'
+                ) {
+                  alert('수강 등록 및 결제가 성공했습니다.');
+
+                  window.location.reload();
+                } else {
+                  // 수강 등록이 실패한 경우에 대한 처리
+                  alert('수강 등록에 실패했습니다.');
+                  return;
+                }
+              } else {
+                // 결제 검증 실패
+                alert('결제 검증에 실패했습니다.');
+                return;
+              }
+            } catch (error) {
+              console.error('API 호출 중 오류:', error);
+              alert('결제 요청 중 오류가 발생했습니다.');
+              return;
+            }
+          } else {
+            alert(`결제 실패: ${error_msg}`);
+            return;
+          }
+        });
+      } catch (error) {
+        console.error('API 호출 중 오류:', error);
+        alert('결제 요청 중 오류가 발생했습니다.');
+        return;
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,6 +511,7 @@ const Cart = () => {
       const lectureIds = selectedItems
         .map(selectedIndex => cartItems[selectedIndex]?.LectureID)
         .filter(Boolean);
+      const token = jsCookie.get('userToken');
       const deletePromises = lectureIds.map(async id => {
         await axios.post(
           `${baseUrl}/api/cart/delete-lecture`,
@@ -58,9 +520,13 @@ const Cart = () => {
           },
           {
             withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
       });
+      alert('강의를 삭제했습니다.'); // 여기에 alert 추가
 
       await Promise.all(deletePromises);
 
@@ -242,9 +708,18 @@ const Cart = () => {
                     <p className='value'>{formattedTotalAmount}원</p>
                   </div>
                 </div>
-                <button href='#' className='btn-continue'>
-                  결제하기
-                </button>
+                <div>
+                  <button onClick={handleEnrollClick} className='btn-continue'>
+                    수강하기
+                  </button>
+                  <PaymentModal
+                    isOpen={isPaymentModalOpen}
+                    onClose={() => setIsPaymentModalOpen(false)}
+                    onPayWithKakaoPay={handlePayWithKakaoPay}
+                    onPayWithTossPay={handlePayWithTossPay}
+                    onPayNormally={LectureEnrollHandler}
+                  />
+                </div>
               </div>
             </div>
           </div>

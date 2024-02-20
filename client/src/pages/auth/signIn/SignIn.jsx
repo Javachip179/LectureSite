@@ -45,11 +45,12 @@ const SignIn = ({ closeModal }) => {
           { withCredentials: true }
         );
 
-        if (response.status === 200) {
-          signIn(response.data.UserEmail, response.data.Password);
-          closeModal();
-          window.location.reload();
-        }
+        console.log('response.date???', response.date);
+
+        signIn(response.data.UserEmail, response.data.Password);
+        closeModal();
+        alert(`올잇원에 오신것을 환영합니다!`);
+        window.location.reload();
       } catch (error) {
         if (error.response && error.response.status === 409) {
           alert(error.response.data.message); // 중복된 이메일 알림 표시
@@ -124,7 +125,11 @@ const SignIn = ({ closeModal }) => {
             </div>
 
             {/* 로그인 버튼 */}
-            <button type='submit' className='signin-button'>
+            <button
+              type='submit'
+              className='signin-button'
+              onClick={() => alert('올잇원에 오신걸 환영합니다!')}
+            >
               로그인
             </button>
 

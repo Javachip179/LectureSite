@@ -79,7 +79,7 @@
     .logo img {
       height: 40px; // 로고의 크기는 이미지에 따라 조정해야 할 수 있습니다.
     }
-  
+
     .drop-down {
       position: relative;
       display: inline-block;
@@ -166,7 +166,7 @@
         display: none; // Initially hide the sub-dropdown
         position: absolute;
         left: 100%; // Position to the right of the parent category
-        top: 0;
+        top: 0px;
         white-space: nowrap; // 서브 메뉴 아이템들이 줄바꿈 되지 않도록 설정
         min-width: 160px;
         background-color: #fff;
@@ -184,8 +184,10 @@
         }
       }
     }
+
     
-  
+    
+    
     .links {
       display: flex;
       align-items: center; /* 요소들을 세로 방향으로 중앙에 배치합니다. */

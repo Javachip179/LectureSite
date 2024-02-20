@@ -31,20 +31,18 @@ router.get('/:searchWord', (req, res) => {
     AVG(c.Rating) AS AverageRating
 FROM
     Lectures l
-JOIN
+LEFT JOIN
     LectureCategory lc ON l.LectureID = lc.LectureID
-JOIN
+LEFT JOIN
     Comments c ON l.LectureID = c.LectureID
-JOIN
+LEFT JOIN
     Category c2 ON c2.CategoryID = lc.CategoryID
-JOIN
+LEFT JOIN
     Subcategory s ON s.CategoryID = c2.CategoryID
-JOIN
+LEFT JOIN
     Instructor i ON l.InstructorID = i.InstructorID
 WHERE
-    l.Title LIKE '%${searchWord}%' OR 
-    c2.CategoryName LIKE '%${searchWord}%' OR 
-    s.SubcategoryName LIKE '%${searchWord}%'
+    l.Title LIKE '%${searchWord}%'
 GROUP BY
     l.LectureID, l.LectureImageURL, l.Title, l.LecturePrice, i.InstructorName
 ORDER BY

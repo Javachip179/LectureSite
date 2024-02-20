@@ -1,0 +1,116 @@
+/* style.css */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 모달이 다른 요소들 위에 표시되도록 z-index 설정 */
+}
+
+.modal-content {
+  position: relative; /* 닫기 버튼을 위해 relative 위치 추가 */
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  width: 500px;
+  max-width: 80%;
+  z-index: 1001;
+}
+
+.title {
+  padding: 10px;
+  color: #333; /* 제목 색상 */
+  margin-bottom: 16px; /* 제목과 내용 사이의 여백 */
+  font-size: 1.2rem; /* 제목 폰트 크기 */
+}
+
+.pay-buttons {
+  display: flex;
+  justify-content: center; /* 가로 방향 중앙 정렬 */
+  gap: 10px; /* 버튼 사이의 간격 */
+}
+
+.kakaopay {
+  background-color: #FEE500; /* 배경색 */
+  display: inline-flex; /* Flexbox를 사용하여 내용물을 중앙 정렬 */
+  align-items: center; /* 세로 방향으로 중앙 정렬 */
+  justify-content: center; /* 가로 방향으로 중앙 정렬 */
+  width: 120px; /* 버튼의 너비 */
+  height: 40px; /* 버튼의 높이 */
+  border: 1px solid #ccc; /* 테두리 */
+  cursor: pointer; /* 마우스 오버 시 커서 변경 */
+  margin: 5px; /* 마진 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 없음 */
+  background-position: center; /* 배경 이미지 위치 */
+  background-size: 60%; /* 배경 이미지 크기를 버튼 크기의 60%로 조정 */
+  text-indent: 0; /* 텍스트 들여쓰기 없음 */
+  color: #333; /* 버튼 텍스트 색상 */
+  font-size: 14px; /* 텍스트 크기 */
+  border-radius: 5px;
+  background-image: url('../../../../img/kakaopay.png');
+}
+
+.tosspay {
+  background-color: #3182f6; /* 배경색 */
+  display: inline-flex; /* Flexbox를 사용하여 내용물을 중앙 정렬 */
+  align-items: center; /* 세로 방향으로 중앙 정렬 */
+  justify-content: center; /* 가로 방향으로 중앙 정렬 */
+  width: 120px; /* 버튼의 너비 */
+  height: 40px; /* 버튼의 높이 */
+  border: 1px solid #ccc; /* 테두리 */
+  cursor: pointer; /* 마우스 오버 시 커서 변경 */
+  margin: 5px; /* 마진 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 없음 */
+  background-position: center; /* 배경 이미지 위치 */
+  background-size: 60%; /* 배경 이미지 크기를 버튼 크기의 60%로 조정 */
+  text-indent: 0; /* 텍스트 들여쓰기 없음 */
+  color: #333; /* 버튼 텍스트 색상 */
+  font-size: 14px; /* 텍스트 크기 */
+  border-radius: 5px;
+  background-image: url('../../../../img/tosspay.png');
+}
+
+.normalpay {
+  display: inline-flex; /* Flexbox를 사용하여 내용물을 중앙 정렬 */
+  align-items: center; /* 세로 방향으로 중앙 정렬 */
+  justify-content: center; /* 가로 방향으로 중앙 정렬 */
+  width: 120px; /* 버튼의 너비 */
+  height: 40px; /* 버튼의 높이 */
+  border: 1px solid #ccc; /* 테두리 */
+  cursor: pointer; /* 마우스 오버 시 커서 변경 */
+  margin: 5px; /* 마진 */
+  background-repeat: no-repeat; /* 배경 이미지 반복 없음 */
+  background-position: center; /* 배경 이미지 위치 */
+  background-size: 60%; /* 배경 이미지 크기를 버튼 크기의 60%로 조정 */
+  text-indent: 0; /* 텍스트 들여쓰기 없음 */
+  color: #333; /* 버튼 텍스트 색상 */
+  font-size: 14px; /* 텍스트 크기 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  border-radius: 5px;
+}
+
+.close-button {
+  position: absolute; /* 절대 위치 설정 */
+  top: 10px; /* 상단에서 10px 떨어진 위치 */
+  right: 10px; /* 오른쪽에서 10px 떨어진 위치 */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1050; /* 모달 콘텐츠 위에 위치하도록 z-index 설정 */
+
+  &:hover {
+    background-color: #e6e6e6; /* 호버 시 배경색 변경 */
+  }
+}

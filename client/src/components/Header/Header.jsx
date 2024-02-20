@@ -114,7 +114,10 @@ const Header = () => {
   };
 
   const handleMouseEnterCategory = categoryId => {
+    // setActiveCategoryId 함수를 호출하여 현재 활성화된 카테고리 ID를 설정합니다.
     setActiveCategoryId(categoryId);
+
+    // 선택된 카테고리 ID에 해당하는 서브 카테고리 데이터를 가져옵니다.
     fetchSubCategories(categoryId);
   };
 
@@ -213,7 +216,7 @@ const Header = () => {
                 onMouseLeave={closeProfileDropdown}
               >
                 <img
-                  src={currentUser.ProfileImage || UserIcon}
+                  src={currentUser?.ProfileImage || UserIcon}
                   alt='프로필 이미지'
                   className='usericon'
                 />

@@ -285,7 +285,7 @@ router.post('/kakao/callback', async function (req, res) {
   let UserCellPhone = '';
   let UserNickname = '';
   let ProfileImage = '';
-  let Introduction = '';
+  let Introduction = '나만의 스킬, 깃허브 링크 등으로 소개글을 채워보세요';
 
   console.log(Introduction);
 
@@ -329,16 +329,14 @@ router.post('/kakao/callback', async function (req, res) {
               res.status(500).json({ error: '내부 서버 오류' });
               return;
             }
-            if (result.length > 0) {
-              // 이미 존재하는 이메일이면 클라이언트로 알림
-              res.status(409).json({ message: '중복된 이메일입니다.' });
-            } else {
+
+            if (result.length === 0) {
               // 비밀번호 해싱
               const hashedPassword = await bcrypt.hash(Password, 10);
               // console.log("hashedPassword", hashedPassword);
 
               conn.query(
-                'INSERT INTO users (UserEmail, UserName, UserCellPhone, Password, ProfileImage, UserNickname) VALUES (?, ?, ?, ?, ?, ?)',
+                'INSERT INTO users (UserEmail, UserName, UserCellPhone, Password, ProfileImage, UserNickname, Introduction) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [
                   UserEmail,
                   UserName,
@@ -346,6 +344,7 @@ router.post('/kakao/callback', async function (req, res) {
                   hashedPassword,
                   ProfileImage,
                   UserNickname,
+                  Introduction,
                 ],
                 (err, result) => {
                   if (err) {

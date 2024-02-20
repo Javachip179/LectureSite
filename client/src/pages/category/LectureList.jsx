@@ -130,7 +130,7 @@ const LectureList = () => {
               {CategoryName} / {SubcategoryName}
             </h3>
 
-            <div className='category-buttons'>
+            {/* <div className='category-buttons'>
               {subcategories.map(subcategory => (
                 <button
                   key={subcategory.SubcategoryID}
@@ -141,7 +141,7 @@ const LectureList = () => {
                   {subcategory.SubcategoryName}
                 </button>
               ))}
-            </div>
+            </div> */}
 
             <div className='card-courses'>
               {lectureListData && lectureListData.length > 0 ? (
