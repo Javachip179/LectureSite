@@ -111,7 +111,7 @@ const WatchLecture = () => {
                     .filter(menu => menu.ParentTOCID === null)
                     .map(menu => (
                       <li key={menu.TOCID} className='menu-item'>
-                        <div className='menu-item-title'>{menu.Title}</div>
+                        <div className='menu-item-title'>{menu.TocTitle}</div>
                         {tocData
                           .filter(subMenu => subMenu.ParentTOCID === menu.TOCID)
                           .map(subMenu => (
@@ -123,7 +123,7 @@ const WatchLecture = () => {
                                     handleMenuItemClick(subMenu.TOCID)
                                   }
                                 >
-                                  {subMenu.Title}
+                                  {subMenu.TocTitle}
                                 </a>
                               </li>
                             </ul>

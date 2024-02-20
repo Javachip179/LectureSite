@@ -1003,7 +1003,9 @@ const LectureInfo = () => {
                               ) : (
                                 <GoChevronUp />
                               )}
-                              <span className='menu-title'>{menu.Title}</span>
+                              <span className='menu-title'>
+                                {menu.TocTitle}
+                              </span>
                             </div>
                             {menuStates[`menu${menu.TOCID}Open`] && (
                               <ul className='dropdown-content'>
@@ -1023,7 +1025,7 @@ const LectureInfo = () => {
                                       }
                                     >
                                       <FaRegCirclePlay />
-                                      {subMenu.Title}
+                                      {subMenu.TocTitle}
                                     </li>
                                   ))}
                               </ul>

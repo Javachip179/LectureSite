@@ -26,6 +26,7 @@ const SignIn = ({ closeModal }) => {
     try {
       await signIn(userEmail, password);
       closeModal();
+      alert('올잇원에 오신걸 환영합니다!');
       window.location.reload();
     } catch (error) {
       console.error('인증 중 오류:', error);
@@ -49,7 +50,7 @@ const SignIn = ({ closeModal }) => {
 
         signIn(response.data.UserEmail, response.data.Password);
         closeModal();
-        alert(`올잇원에 오신것을 환영합니다!`);
+        // alert(`올잇원에 오신것을 환영합니다!`);
         window.location.reload();
       } catch (error) {
         if (error.response && error.response.status === 409) {
@@ -62,7 +63,7 @@ const SignIn = ({ closeModal }) => {
   };
 
   const kakaoOnFailure = error => {
-    window.location.href = 'http://localhost:3000';
+    window.location.href = 'http://15.164.214.241:3000';
   };
 
   const togglePasswordVisibility = () => {
@@ -128,7 +129,7 @@ const SignIn = ({ closeModal }) => {
             <button
               type='submit'
               className='signin-button'
-              onClick={() => alert('올잇원에 오신걸 환영합니다!')}
+              onClick={handleSignIn}
             >
               로그인
             </button>

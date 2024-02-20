@@ -44,7 +44,7 @@ router.get('/:lectureId', (req, res) => {
       const TOCQuery = `
         SELECT
           lt.TOCID ,
-          lt.Title ,
+          lt.TocTitle ,
           lt.ParentTOCID
         FROM
           LectureTOC lt
