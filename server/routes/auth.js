@@ -321,7 +321,7 @@ router.post('/kakao/callback', async function (req, res) {
         }
 
         conn.query(
-          'SELECT UserEmail, Password FROM users WHERE UserEmail = ?',
+          'SELECT UserEmail, Password FROM Users WHERE UserEmail = ?',
           [UserEmail],
           async (err, result) => {
             // console.log("result12", result);
@@ -337,7 +337,7 @@ router.post('/kakao/callback', async function (req, res) {
               // console.log("hashedPassword", hashedPassword);
 
               conn.query(
-                'INSERT INTO users (UserEmail, UserName, UserCellPhone, Password, ProfileImage, UserNickname, Introduction) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO Users (UserEmail, UserName, UserCellPhone, Password, ProfileImage, UserNickname, Introduction) VALUES (?, ?, ?, ?, ?, ?, ?)',
                 [
                   UserEmail,
                   UserName,

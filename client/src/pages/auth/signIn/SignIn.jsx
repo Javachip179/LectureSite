@@ -18,7 +18,6 @@ const SignIn = ({ closeModal }) => {
   const [errorMessage, setErrorMessage] = useState(''); // 오류 메시지 상태
 
   const kakaoClientId = process.env.REACT_APP_KAKAO_CLIENT_ID;
-  // console.log("Kakao client", kakaoClientId)
 
   const handleSignIn = async e => {
     e.preventDefault();
@@ -49,9 +48,9 @@ const SignIn = ({ closeModal }) => {
         console.log('response.date???', response.date);
 
         signIn(response.data.UserEmail, response.data.Password);
+        alert(`올잇원에 오신것을 환영합니다!`);
         closeModal();
-        // alert(`올잇원에 오신것을 환영합니다!`);
-        window.location.reload();
+        navigate('/');
       } catch (error) {
         if (error.response && error.response.status === 409) {
           alert(error.response.data.message); // 중복된 이메일 알림 표시
@@ -63,7 +62,7 @@ const SignIn = ({ closeModal }) => {
   };
 
   const kakaoOnFailure = error => {
-    window.location.href = 'http://15.164.214.241:3000';
+    window.location.href = 'http://localhost:3000';
   };
 
   const togglePasswordVisibility = () => {
@@ -139,7 +138,6 @@ const SignIn = ({ closeModal }) => {
               카카오톡 로그인
             </button> */}
             <KakaoLogin
-              className='kakao-signin'
               token={kakaoClientId}
               onSuccess={kakaoOnSuccess}
               onFail={kakaoOnFailure}
