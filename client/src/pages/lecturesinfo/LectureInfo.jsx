@@ -152,53 +152,58 @@ const LectureInfo = () => {
       return ratingPercentages;
     };
 
-    const fetchCart = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}/api/cart/cartlist/check`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            lectureId: lectureID,
-          },
-        });
+    if (currentUser) {
+      const fetchCart = async () => {
+        try {
+          const response = await axios.get(
+            `${baseUrl}/api/cart/cartlist/check`,
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              params: {
+                lectureId: lectureID,
+              },
+            }
+          );
 
-        // console.log("cart API 응답:", response);
+          // console.log("cart API 응답:", response);
 
-        if (response.data) {
-          setIsInCart(true);
-        } else {
-          setIsInCart(false);
-        }
-      } catch (error) {
-        console.error('API 호출 중 오류:', error);
-      }
-    };
-
-    fetchCart();
-
-    const fetchEnrollment = async () => {
-      try {
-        const response = await axios.get(
-          `${baseUrl}/api/enrollment/checked/${lectureID}`,
-          {
-            withCredentials: true,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+          if (response.data) {
+            setIsInCart(true);
+          } else {
+            setIsInCart(false);
           }
-        );
+        } catch (error) {
+          console.error('API 호출 중 오류:', error);
+        }
+      };
 
-        // console.log("enroll API 응답:", response);
+      fetchCart();
 
-        setIsEnrollment(response.data);
-      } catch (error) {
-        console.error('API 호출 중 오류:', error);
-      }
-    };
+      const fetchEnrollment = async () => {
+        try {
+          const response = await axios.get(
+            `${baseUrl}/api/enrollment/checked/${lectureID}`,
+            {
+              withCredentials: true,
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-    fetchEnrollment();
+          // console.log("enroll API 응답:", response);
+
+          setIsEnrollment(response.data);
+        } catch (error) {
+          console.error('API 호출 중 오류:', error);
+        }
+      };
+
+      fetchEnrollment();
+    }
   }, []);
 
   const scrollToSection = menuItem => {

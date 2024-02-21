@@ -70,6 +70,10 @@
   .payment-container-date {
     min-width: 97px;
   }
+
+  .payment-container-payment {
+    min-width: 81px;
+  }
   
   .payment-container-progress {
     min-width: 67px;
@@ -85,6 +89,7 @@
   .payment-title,
   .payment-price,
   .payment-date,
+  .payment-payment,
   .payment-progress {
     font-size: 14px;
   }

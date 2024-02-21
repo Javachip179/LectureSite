@@ -43,6 +43,7 @@ const Payment = () => {
                 <th className='payment-container-title'>강의명</th>
                 <th className='payment-container-price'>구매금액</th>
                 <th className='payment-container-date'>구매일</th>
+                <th className='payment-container-payment'>결제방법</th>
               </tr>
             </thead>
             <tbody>
@@ -56,6 +57,7 @@ const Payment = () => {
                   <td className='payment-date'>
                     {payment.PaymentDate.split('T')[0]}
                   </td>
+                  <td className='payment-payment'>{payment.Payment}</td>
                 </tr>
               ))}
             </tbody>
